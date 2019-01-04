@@ -49,7 +49,7 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GLib
 
-from pyanaconda import iutil
+from pyanaconda.core import util
 from pyanaconda.ui.categories.system import SystemCategory
 from pyanaconda.ui.gui.spokes import NormalSpoke
 from pyanaconda.ui.common import FirstbootOnlySpokeMixIn
@@ -465,9 +465,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         process_error = None
 
         try:
-            sys_root = iutil.getSysroot()
+            sys_root = util.getSysroot()
 
-            cmd = iutil.startProgram(command, stderr=subprocess.PIPE, stdin=stdin, root=sys_root)
+            cmd = util.startProgram(command, stderr=subprocess.PIPE, stdin=stdin, root=sys_root)
 
             (stdout, stderr) = cmd.communicate()
 
