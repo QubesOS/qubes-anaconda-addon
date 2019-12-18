@@ -146,7 +146,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
     title = N_("_QUBES OS")
 
     ### methods defined by API ###
-    def __init__(self, data, storage, payload, instclass):
+    def __init__(self, data, storage, payload):
         """
         :see: pyanaconda.ui.common.Spoke.__init__
         :param data: data object passed to every spoke to load/store data
@@ -157,12 +157,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         :type storage: blivet.Blivet
         :param payload: object storing packaging-related information
         :type payload: pyanaconda.packaging.Payload
-        :param instclass: distribution-specific information
-        :type instclass: pyanaconda.installclass.BaseInstallClass
 
         """
 
-        NormalSpoke.__init__(self, data, storage, payload, instclass)
+        NormalSpoke.__init__(self, data, storage, payload)
 
         self.logger = logging.getLogger("anaconda")
 

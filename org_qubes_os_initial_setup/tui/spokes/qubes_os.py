@@ -55,7 +55,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
     # category this spoke belongs to
     category = SystemCategory
 
-    def __init__(self, data, storage, payload, instclass):
+    def __init__(self, data, storage, payload):
         """
         :see: pyanaconda.ui.tui.base.UIScreen
         :see: pyanaconda.ui.tui.base.App
@@ -67,12 +67,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
         :type storage: blivet.Blivet
         :param payload: object storing packaging-related information
         :type payload: pyanaconda.packaging.Payload
-        :param instclass: distribution-specific information
-        :type instclass: pyanaconda.installclass.BaseInstallClass
 
         """
 
-        NormalTUISpoke.__init__(self, data, storage, payload, instclass)
+        NormalTUISpoke.__init__(self, data, storage, payload)
 
         self.initialize_start()
 

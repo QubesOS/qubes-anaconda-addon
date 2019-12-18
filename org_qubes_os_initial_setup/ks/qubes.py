@@ -164,7 +164,7 @@ class QubesData(AddonData):
         section += '%end\n'
         return section
 
-    def execute(self, storage, ksdata, instClass, users, payload):
+    def execute(self, storage, ksdata, users, payload):
         if self.gui_mode:
             from ..gui import ThreadDialog
             self.thread_dialog = ThreadDialog(
