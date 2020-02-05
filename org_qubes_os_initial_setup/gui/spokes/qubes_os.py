@@ -197,7 +197,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         if self.qubes_data.usbvm_available:
             self.choice_usb = QubesChoice(
-                _('Create USB qube holding all USB controllers (sys-usb)'))
+                _('Use a qube to hold all USB controllers (create a new qube called sys-usb by default)'))
         else:
             self.choice_usb = DisabledChoice(
                 _('USB qube configuration disabled - you are using USB '
