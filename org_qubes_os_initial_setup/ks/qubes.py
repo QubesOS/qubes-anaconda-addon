@@ -25,6 +25,7 @@ import pyudev
 import subprocess
 
 from pyanaconda.core import util
+from pyanaconda.core.configuration.anaconda import conf
 from pyanaconda.addons import AddonData
 from pykickstart.errors import KickstartValueError
 from pyanaconda.anaconda_loggers import get_module_logger
@@ -236,7 +237,7 @@ class QubesData(AddonData):
         process_error = None
 
         try:
-            sys_root = util.getSysroot()
+            sys_root = conf.target.system_root
 
             cmd = util.startProgram(command,
                 stderr=subprocess.PIPE,
