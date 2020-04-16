@@ -19,7 +19,7 @@
 #
 import grp
 import os
-
+import glob
 import distutils.version
 import pyudev
 import subprocess
@@ -34,6 +34,17 @@ log = get_module_logger(__name__)
 
 __all__ = ['QubesData']
 
+TEMPLATES_RPM_PATH = '/root/qubes-templates/'
+
+def get_template_rpm(template):
+    try:
+        rpm = glob.glob(TEMPLATES_RPM_PATH + 'qubes-template-%s-*.rpm' % template)[0]
+    except IndexError:
+        rpm = None
+    return rpm
+
+def is_template_rpm_available(template):
+    return bool(get_template_rpm(template))
 
 def is_package_installed(pkgname):
     pkglist = subprocess.check_output(['rpm', '-qa', pkgname])
@@ -89,10 +100,17 @@ class QubesData(AddonData):
         """
 
         super(QubesData, self).__init__(name)
+        self.templates_aliases = {
+            'fedora': 'Fedora',
+            'debian': 'Debian'
+        }
+        self.fedora_available = is_template_rpm_available('fedora')
+        self.debian_available = is_template_rpm_available('debian')
 
         self.whonix_available = (
-                is_package_installed('qubes-template-whonix-gw*') and
-                is_package_installed('qubes-template-whonix-ws*'))
+                is_template_rpm_available('whonix-gw') and
+                is_template_rpm_available('whonix-ws'))
+
         self.usbvm_available = (
                 not usb_keyboard_present() and not started_from_usb())
         self.system_vms = True
@@ -104,25 +122,21 @@ class QubesData(AddonData):
         self.usbvm = self.usbvm_available
         self.usbvm_with_netvm = False
 
+        self.custom_pool = False
+        # Set value of VG/TP to default ones if apply
+        self.vg_tpool = ('qubes_dom0', 'pool01')
+
         self.skip = False
+
+        self.default_template = None
+        self.templates_to_install = \
+            ['fedora', 'debian', 'whonix-gw', 'whonix-ws']
 
         # this is a hack, but initial-setup do not have progress hub or similar
         # provision for handling lengthy self.execute() call, so we must do it
         # ourselves
         self.gui_mode = False
         self.thread_dialog = None
-
-        # choose latest fedora template
-        fedora_tpls = sorted(
-            name for name in os.listdir('/var/lib/qubes/vm-templates')
-            if 'fedora' in name)
-        if fedora_tpls:
-            self.default_template = fedora_tpls[-1]
-        else:
-            print(
-                'ERROR: No Fedora template is installed, '
-                'cannot set default template!')
-            self.default_template = None
 
         self.qubes_user = None
 
@@ -201,17 +215,8 @@ class QubesData(AddonData):
         os.umask(0o0007)
 
         self.configure_default_kernel()
-
-        # Finish template(s) installation, because it wasn't fully possible
-        # from anaconda (it isn't possible to start a VM there).
-        # This is specific to firstboot, not general configuration.
-        for template in os.listdir('/var/lib/qubes/vm-templates'):
-            try:
-                self.configure_template(template,
-                    '/var/lib/qubes/vm-templates/' + template)
-            except Exception as e:
-                errors.append(('Templates', str(e)))
-
+        self.configure_default_pool()
+        self.install_templates()
         self.configure_dom0()
         self.configure_default_template()
         self.configure_qubes()
@@ -269,12 +274,30 @@ class QubesData(AddonData):
         self.run_command([
             '/usr/bin/qubes-prefs', 'default-kernel', default_kernel])
 
+    def configure_default_pool(self):
+        self.set_stage("Setting up default pool")
+        if self.vg_tpool:
+            self.run_command(['/usr/bin/qvm-pool', '--add', 'default', 'lvm_thin',
+                              '-o', 'volume_group=%s,thin_pool=%s,revisions_to_keep=2' % self.vg_tpool])
+
+    def install_templates(self):
+        self.set_stage("Installing Qubes templates")
+        for template in self.templates_to_install:
+            rpm = get_template_rpm(template)
+            self.run_command(['/usr/bin/rpm', '-i', rpm])
+            os.remove(rpm)
+
     def configure_dom0(self):
         self.set_stage("Setting up administration VM (dom0)")
 
         for service in ['rdisc', 'kdump', 'libvirt-guests', 'salt-minion']:
             self.run_command(['systemctl', 'disable', '{}.service'.format(service) ], ignore_failure=True)
             self.run_command(['systemctl', 'stop',    '{}.service'.format(service) ], ignore_failure=True)
+
+    def configure_default_template(self):
+        self.set_stage('Setting default template')
+        if self.default_template:
+            self.run_command(['/usr/bin/qubes-prefs', 'default-template', self.default_template])
 
     def configure_qubes(self):
         self.set_stage('Executing qubes configuration')
@@ -330,10 +353,6 @@ class QubesData(AddonData):
                      "'sudo qubesctl --all state.highstate' in dom0 (you will get " +
                      "detailed state there)."))
 
-    def configure_default_template(self):
-        self.set_stage('Setting default template')
-        self.run_command(['/usr/bin/qubes-prefs', 'default-template', self.default_template])
-
     def configure_default_dvm(self):
         self.set_stage("Creating default DisposableVM")
 
@@ -354,9 +373,4 @@ class QubesData(AddonData):
         self.run_command(['/usr/bin/qubes-prefs', 'updatevm', updatevm])
         self.run_command(['/usr/bin/qubes-prefs', 'clockvm', 'sys-net'])
         self.run_command(['/usr/bin/qvm-start', default_netvm])
-
-    def configure_template(self, template, path):
-        self.set_stage("Configuring TemplateVM {}".format(template))
-        self.run_command([
-            'qvm-template-postprocess', '--really', 'post-install', template, path])
 
