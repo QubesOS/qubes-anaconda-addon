@@ -46,6 +46,14 @@ def get_template_rpm(template):
 def is_template_rpm_available(template):
     return bool(get_template_rpm(template))
 
+def get_template_version(template):
+    rpm = get_template_rpm(template)
+    if rpm:
+        rpm = os.path.basename(rpm)
+        version = rpm.replace('qubes-template-%s-' % template, '').split('-')[0]
+        return version
+
+
 def is_package_installed(pkgname):
     pkglist = subprocess.check_output(['rpm', '-qa', pkgname])
     return bool(pkglist)
@@ -100,16 +108,26 @@ class QubesData(AddonData):
         """
 
         super(QubesData, self).__init__(name)
-        self.templates_aliases = {
-            'fedora': 'Fedora',
-            'debian': 'Debian'
-        }
         self.fedora_available = is_template_rpm_available('fedora')
         self.debian_available = is_template_rpm_available('debian')
 
         self.whonix_available = (
                 is_template_rpm_available('whonix-gw') and
                 is_template_rpm_available('whonix-ws'))
+
+        self.templates_aliases = {}
+        self.templates_versions = {}
+        if self.fedora_available:
+            self.templates_versions['fedora'] = get_template_version('fedora')
+            self.templates_aliases['fedora'] = 'Fedora %s' % self.templates_versions['fedora']
+
+        if self.debian_available:
+            self.templates_versions['debian'] = get_template_version('debian')
+            self.templates_aliases['debian'] = 'Debian %s' % self.templates_versions['debian']
+
+        if self.whonix_available:
+            self.templates_versions['whonix'] = get_template_version('whonix-ws')
+            self.templates_aliases['whonix'] = 'Whonix %s' % self.templates_versions['whonix']
 
         self.usbvm_available = (
                 not usb_keyboard_present() and not started_from_usb())
@@ -297,6 +315,7 @@ class QubesData(AddonData):
     def configure_default_template(self):
         self.set_stage('Setting default template')
         if self.default_template:
+            self.default_template = '%s-%s' % (self.default_template, self.templates_versions[self.default_template])
             self.run_command(['/usr/bin/qubes-prefs', 'default-template', self.default_template])
 
     def configure_qubes(self):

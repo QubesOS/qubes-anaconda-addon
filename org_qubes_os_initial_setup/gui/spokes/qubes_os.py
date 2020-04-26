@@ -332,7 +332,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 self.qubes_data.templates_aliases['fedora'])
             self.choice_install_fedora = QubesChoice(
                 location=self.templatesBox,
-                label=_('Fedora')
+                label=_(self.qubes_data.templates_aliases['fedora'])
             )
         else:
             self.choice_install_fedora = DisabledChoice(
@@ -345,7 +345,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 self.qubes_data.templates_aliases['debian'])
             self.choice_install_debian = QubesChoice(
                 location=self.templatesBox,
-                label=_('Debian'),
+                label=_(self.qubes_data.templates_aliases['debian']),
             )
         else:
             self.choice_install_debian = DisabledChoice(
@@ -356,7 +356,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         if self.qubes_data.whonix_available:
             self.choice_install_whonix = QubesChoice(
                 location=self.templatesBox,
-                label=_('Whonix'),
+                label=_(self.qubes_data.templates_aliases['whonix']),
             )
         else:
             self.choice_install_whonix = DisabledChoice(
