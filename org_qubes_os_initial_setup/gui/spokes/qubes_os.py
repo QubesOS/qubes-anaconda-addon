@@ -475,6 +475,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.choice_custom_pool.widget.set_active(False)
         if self.thin_pools:
+            if ('qubes_dom0', 'pool01') in self.thin_pools:
+                self.choice_pool_list.set_vgroup('qubes_dom0')
+                self.choice_pool_list.set_tpool('pool01')
             self.choice_pool_list.widget.set_sensitive(False)
 
     def initialize(self):
@@ -562,7 +565,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.qubes_data.whonix_default = self.choice_whonix_updates.get_selected()
 
         self.qubes_data.custom_pool = self.choice_custom_pool.get_selected()
-        if self.choice_pool_list:
+        if self.choice_pool_list and \
+                self.choice_pool_list.get_vgroup() and \
+                self.choice_pool_list.get_tpool():
             self.qubes_data.vg_tpool = (self.choice_pool_list.get_vgroup(),
                                         self.choice_pool_list.get_tpool())
 

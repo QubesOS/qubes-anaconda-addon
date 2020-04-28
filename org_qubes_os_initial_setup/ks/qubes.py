@@ -142,7 +142,7 @@ class QubesData(AddonData):
 
         self.custom_pool = False
         # Set value of VG/TP to default ones if apply
-        self.vg_tpool = ('qubes_dom0', 'pool01')
+        self.vg_tpool = None
 
         self.skip = False
 
