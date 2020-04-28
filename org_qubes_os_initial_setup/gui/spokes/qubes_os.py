@@ -27,6 +27,8 @@
 _ = lambda x: x
 N_ = lambda x: x
 
+import os
+import subprocess
 import logging
 import gi
 
@@ -39,16 +41,8 @@ from pyanaconda.ui.categories.system import SystemCategory
 from pyanaconda.ui.gui.spokes import NormalSpoke
 from pyanaconda.ui.common import FirstbootOnlySpokeMixIn
 
-# Useful for devel mode
-try:
-    from qubes.storage.lvm import list_thin_pools
-except ImportError:
-    def list_thin_pools():
-        return []
-
 # export only the spoke, no helper functions, classes or constants
 __all__ = ["QubesOsSpoke"]
-
 choices_instances = []
 
 
@@ -317,11 +311,13 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.logger = logging.getLogger("anaconda")
         self.qubes_data = self.data.addons.org_qubes_os_initial_setup
-        self.thin_pools = list_thin_pools()
 
         self.templatesBox = self.builder.get_object("templatesBox")
         self.mainBox = self.builder.get_object("mainBox")
         self.advancedBox = self.builder.get_object("advancedBox")
+
+        self.lvm_cache = self.init_cache()
+        self.thin_pools = None
 
         self.init_qubes_choices()
 
@@ -421,6 +417,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 indent=True
             )
 
+        self.thin_pools = self.list_thin_pools()
         if self.thin_pools:
             self.choice_custom_pool = QubesChoice(
                 location=self.advancedBox,
@@ -632,3 +629,48 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         """
 
         pass
+
+    @staticmethod
+    def _parse_lvm_cache(lvm_output):
+        result = {}
+
+        for line in lvm_output.splitlines():
+            line = line.decode().strip()
+            vg_name, name, attr = line.split(';', 3)
+            if '' in [vg_name, name]:
+                continue
+            name = vg_name + "/" + name
+            result[name] = {'attr': attr}
+
+        return result
+
+    def init_cache(self):
+        cmd = ['lvs', '--noheadings', '-o', 'vg_name,name,lv_attr', '--separator', ';']
+        if os.getuid() != 0:
+            cmd = ['sudo'] + cmd
+        environ = os.environ.copy()
+        environ['LC_ALL'] = 'C.utf8'
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                             close_fds=True, env=environ)
+        out, err = p.communicate()
+        return_code = p.returncode
+        if return_code == 0 and err:
+            self.logger.warning(err)
+        elif return_code != 0:
+            raise ValueError(err)
+
+        return self._parse_lvm_cache(out)
+
+    def list_thin_pools(self):
+        """ Return list of thin pools """
+        thpools = []
+        if self.lvm_cache:
+            for key, vol in self.lvm_cache.items():
+                if vol['attr'] and vol['attr'][0] == 't':
+                    # e.g. 'qubes_dom0/pool00'
+                    parsed_key = key.split('/')
+                    if len(parsed_key) == 2:
+                        volume_group = parsed_key[0]
+                        thin_pool = parsed_key[1]
+                        thpools.append((volume_group, thin_pool))
+        return thpools
