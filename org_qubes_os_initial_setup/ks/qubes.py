@@ -299,8 +299,13 @@ class QubesData(AddonData):
                               '-o', 'volume_group=%s,thin_pool=%s,revisions_to_keep=2' % self.vg_tpool])
 
     def install_templates(self):
-        self.set_stage("Installing Qubes templates")
         for template in self.templates_to_install:
+            if template.startswith('whonix'):
+                template_version = self.templates_versions['whonix']
+            else:
+                template_version = self.templates_versions[template]
+            template_name = '%s-%s' % (template, template_version)
+            self.set_stage("Installing TemplateVM %s" % template_name)
             rpm = get_template_rpm(template)
             self.run_command(['/usr/bin/rpm', '-i', rpm])
             os.remove(rpm)
