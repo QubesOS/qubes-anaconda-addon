@@ -501,14 +501,17 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         """
 
         self.choice_install_fedora.set_selected(
+            self.qubes_data.fedora_available and
             'fedora' in self.qubes_data.templates_to_install
         )
 
         self.choice_install_debian.set_selected(
+            self.qubes_data.debian_available and
             'debian' in self.qubes_data.templates_to_install
         )
 
         self.choice_install_whonix.set_selected(
+            self.qubes_data.whonix_available and
             'whonix-gw' in self.qubes_data.templates_to_install and
             'whonix-ws' in self.qubes_data.templates_to_install
         )
