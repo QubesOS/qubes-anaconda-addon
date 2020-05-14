@@ -34,7 +34,7 @@ log = get_module_logger(__name__)
 
 __all__ = ['QubesData']
 
-TEMPLATES_RPM_PATH = '/root/qubes-templates/'
+TEMPLATES_RPM_PATH = '/var/lib/qubes/template-packages/'
 
 def get_template_rpm(template):
     try:
