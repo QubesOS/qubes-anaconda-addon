@@ -421,7 +421,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         if self.thin_pools:
             self.choice_custom_pool = QubesChoice(
                 location=self.advancedBox,
-                label=_("Enable custom storage pool"),
+                label=_("Use custom storage pool"),
             )
         else:
             self.choice_custom_pool = DisabledChoice(
