@@ -141,7 +141,6 @@ class QubesData(AddonData):
         self.usbvm_with_netvm = False
 
         self.custom_pool = False
-        # Set value of VG/TP to default ones if apply
         self.vg_tpool = None
 
         self.skip = False

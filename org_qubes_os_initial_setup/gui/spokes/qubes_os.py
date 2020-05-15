@@ -472,9 +472,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.choice_custom_pool.widget.set_active(False)
         if self.thin_pools:
-            if ('qubes_dom0', 'qubes_dom0-vm-pool') in self.thin_pools:
+            if ('qubes_dom0', 'vm-pool') in self.thin_pools:
                 self.choice_pool_list.set_vgroup('qubes_dom0')
-                self.choice_pool_list.set_tpool('qubes_dom0-vm-pool')
+                self.choice_pool_list.set_tpool('vm-pool')
             self.choice_pool_list.widget.set_sensitive(False)
 
     def initialize(self):
