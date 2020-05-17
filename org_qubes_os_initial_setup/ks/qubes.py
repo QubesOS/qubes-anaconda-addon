@@ -23,6 +23,7 @@ import glob
 import distutils.version
 import pyudev
 import subprocess
+import shutil
 
 from pyanaconda.core import util
 from pyanaconda.core.configuration.anaconda import conf
@@ -307,7 +308,9 @@ class QubesData(AddonData):
             self.set_stage("Installing TemplateVM %s" % template_name)
             rpm = get_template_rpm(template)
             self.run_command(['/usr/bin/rpm', '-i', rpm])
-            os.remove(rpm)
+
+        # Clean RPM after install of selected ones
+        shutil.rmtree(TEMPLATES_RPM_PATH)
 
     def configure_dom0(self):
         self.set_stage("Setting up administration VM (dom0)")
