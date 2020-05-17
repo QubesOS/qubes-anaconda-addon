@@ -294,9 +294,17 @@ class QubesData(AddonData):
 
     def configure_default_pool(self):
         self.set_stage("Setting up default pool")
+        # At this stage:
+        # 1) on default LVM install, '(qubes_dom0, vm-pool)' is available
+        # 2) on non-default LVM install, we assume that user *should* have
+        #    use custom thin pool to use
         if self.vg_tpool:
-            self.run_command(['/usr/bin/qvm-pool', '--add', 'default', 'lvm_thin',
-                              '-o', 'volume_group=%s,thin_pool=%s,revisions_to_keep=2' % self.vg_tpool])
+            volume_group, thin_pool = self.vg_tpool
+            self.run_command(['/usr/bin/qvm-pool', '--add', thin_pool, 'lvm_thin',
+                              '-o', 'volume_group={volume_group},thin_pool={thin_pool},revisions_to_keep=2'.format(
+                    volume_group=volume_group, thin_pool=thin_pool)])
+            self.run_command([
+                '/usr/bin/qubes-prefs', 'default-pool', thin_pool])
 
     def install_templates(self):
         for template in self.templates_to_install:

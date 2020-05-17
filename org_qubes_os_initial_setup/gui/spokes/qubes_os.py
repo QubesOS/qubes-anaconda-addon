@@ -472,6 +472,8 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.choice_custom_pool.widget.set_active(False)
         if self.thin_pools:
+            # If available, we set Qubes default value
+            # for VG and THIN POOL
             if ('qubes_dom0', 'vm-pool') in self.thin_pools:
                 self.choice_pool_list.set_vgroup('qubes_dom0')
                 self.choice_pool_list.set_tpool('vm-pool')
