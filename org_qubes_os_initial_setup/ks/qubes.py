@@ -37,6 +37,7 @@ __all__ = ['QubesData']
 
 TEMPLATES_RPM_PATH = '/var/lib/qubes/template-packages/'
 
+
 def get_template_rpm(template):
     try:
         rpm = glob.glob(TEMPLATES_RPM_PATH + 'qubes-template-%s-*.rpm' % template)[0]
@@ -44,8 +45,10 @@ def get_template_rpm(template):
         rpm = None
     return rpm
 
+
 def is_template_rpm_available(template):
     return bool(get_template_rpm(template))
+
 
 def get_template_version(template):
     rpm = get_template_rpm(template)
@@ -59,10 +62,12 @@ def is_package_installed(pkgname):
     pkglist = subprocess.check_output(['rpm', '-qa', pkgname])
     return bool(pkglist)
 
+
 def usb_keyboard_present():
     context = pyudev.Context()
     keyboards = context.list_devices(subsystem='input', ID_INPUT_KEYBOARD='1')
     return any([d.get('ID_USB_INTERFACES', False) for d in keyboards])
+
 
 def started_from_usb():
     def get_all_used_devices(dev):
@@ -99,7 +104,8 @@ class QubesData(AddonData):
 
     bool_options = (
         'system_vms', 'default_vms', 'whonix_vms', 'whonix_default', 'usbvm',
-        'usbvm_with_netvm', 'skip')
+        'usbvm_with_netvm', 'vg_pool', 'skip'
+    )
 
     def __init__(self, name):
         """
@@ -182,6 +188,14 @@ class QubesData(AddonData):
             setattr(self, param, bool_value)
         elif param == 'default_template':
             self.default_template = value
+        elif param == 'templates_to_install':
+            self.templates_to_install = value.split(' ')
+        elif param == 'lvm_pool':
+            parsed = value.split('/')
+            if len(parsed) != 2:
+                raise KickstartValueError(
+                    'invalid value for lvm_pool: %s' % line)
+            self.vg_tpool = (parsed[0], parsed[1])
         else:
             raise KickstartValueError('invalid parameter: %s' % param)
         self.seen = True
@@ -193,6 +207,11 @@ class QubesData(AddonData):
             section += "{} {!s}\n".format(param, getattr(self, param))
 
         section += 'default_template {}\n'.format(self.default_template)
+        section += 'templates_to_install {}\n'.format(' '.join(self.templates_to_install))
+
+        if self.vg_tpool:
+            vg, tpool = self.vg_tpool
+            section += 'lvm_pool {}/{}\n'.format(vg, tpool)
 
         section += '%end\n'
         return section
