@@ -104,7 +104,7 @@ class QubesData(AddonData):
 
     bool_options = (
         'system_vms', 'default_vms', 'whonix_vms', 'whonix_default', 'usbvm',
-        'usbvm_with_netvm', 'vg_pool', 'skip'
+        'usbvm_with_netvm', 'skip'
     )
 
     def __init__(self, name):
