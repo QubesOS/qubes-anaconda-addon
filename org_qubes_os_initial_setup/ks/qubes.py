@@ -103,8 +103,8 @@ class QubesData(AddonData):
     """
 
     bool_options = (
-        'system_vms', 'default_vms', 'whonix_vms', 'whonix_default', 'usbvm',
-        'usbvm_with_netvm', 'skip'
+        'system_vms', 'disp_firewallvm_and_usbvm', 'disp_netvm','default_vms',
+        'whonix_vms', 'whonix_default', 'usbvm', 'usbvm_with_netvm', 'skip'
     )
 
     def __init__(self, name):
@@ -139,6 +139,10 @@ class QubesData(AddonData):
         self.usbvm_available = (
                 not usb_keyboard_present() and not started_from_usb())
         self.system_vms = True
+
+        self.disp_firewallvm_and_usbvm = True
+        self.disp_netvm = False
+
         self.default_vms = True
 
         self.whonix_vms = self.whonix_available
@@ -359,6 +363,12 @@ class QubesData(AddonData):
         if self.system_vms:
             states.extend(
                 ('qvm.sys-net', 'qvm.sys-firewall', 'qvm.default-dispvm'))
+        if self.disp_firewallvm_and_usbvm:
+            states.append(
+                ('pillar.qvm.disposable-sys-firewall',
+                'pillar.qvm.disposable-sys-usb'))
+        if self.disp_netvm:
+            states.append('pillar.qvm.disposable-sys-net')
         if self.default_vms:
             states.extend(
                 ('qvm.personal', 'qvm.work', 'qvm.untrusted', 'qvm.vault'))

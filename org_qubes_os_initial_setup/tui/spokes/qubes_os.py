@@ -125,6 +125,18 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
                                    '(sys-net, sys-firewall, default DispVM)'),
                            completed=self._system_vms)
         self._container.add(w, self._set_checkbox, '_system_vms')
+        if self._system_vms:
+            w = CheckboxWidget(
+                title=_('Make sys-firewall and sys-usb disposable'),
+                completed=self._disp_firewallvm_and_usbvm)
+            self._container.add(
+                w,
+                self._set_checkbox,
+                '_disp_firewallvm_and_usbvm')
+            w = CheckboxWidget(
+                title=_('Make sys-net disposable'),
+                completed=self._disp_netvm)
+            self._container.add(w, self._set_checkbox, '_disp_netvm')
         w = CheckboxWidget(title=_('Create default application qubes '
                                    '(personal, work, untrusted, vault)'),
                            completed=self._default_vms)

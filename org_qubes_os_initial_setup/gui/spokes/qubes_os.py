@@ -377,6 +377,20 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             dependencies=[self.choice_default_template]
         )
 
+        self.choice_disp_firewallvm_and_usbvm = QubesChoice(
+            location=self.mainBox,
+            label=_("Make sys-firewall and sys-usb disposable"),
+            dependencies=[self.choice_system],
+            indent=True
+        )
+
+        self.choice_disp_netvm = QubesChoice(
+            location=self.mainBox,
+            label=_("Make sys-net disposable"),
+            dependencies=[self.choice_system],
+            indent=True
+        )
+
         self.choice_default = QubesChoice(
             location=self.mainBox,
             label=_('Create default application qubes (personal, work, untrusted, vault)'),
@@ -462,6 +476,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             self.choice_install_whonix.widget.set_active(True)
 
         self.choice_system.widget.set_active(True)
+
+        self.choice_disp_firewallvm_and_usbvm.widget.set_active(True)
+
         self.choice_default.widget.set_active(True)
 
         if self.choice_whonix.widget.get_sensitive():
@@ -519,6 +536,12 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         )
 
         self.choice_system.set_selected(self.qubes_data.system_vms)
+
+        self.choice_disp_firewallvm_and_usbvm.set_selected(
+            self.qubes_data.disp_firewallvm_and_usbvm
+        )
+        self.choice_disp_netvm.set_selected(self.qubes_data.disp_netvm)
+
         self.choice_default.set_selected(self.qubes_data.default_vms)
 
         self.choice_whonix.set_selected(self.qubes_data.whonix_vms)
@@ -558,6 +581,11 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 continue
 
         self.qubes_data.system_vms = self.choice_system.get_selected()
+
+        self.qubes_data.disp_firewallvm_and_usbvm = \
+            self.choice_disp_firewallvm_and_usbvm.get_selected()
+        self.qubes_data.disp_netvm = self.choice_disp_netvm.get_selected()
+
         self.qubes_data.default_vms = self.choice_default.get_selected()
 
         self.qubes_data.usbvm = self.choice_usb.get_selected()
