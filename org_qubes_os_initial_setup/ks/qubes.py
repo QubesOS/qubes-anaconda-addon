@@ -364,7 +364,7 @@ class QubesData(AddonData):
             states.extend(
                 ('qvm.sys-net', 'qvm.sys-firewall', 'qvm.default-dispvm'))
         if self.disp_firewallvm_and_usbvm:
-            states.append(
+            states.extend(
                 ('pillar.qvm.disposable-sys-firewall',
                 'pillar.qvm.disposable-sys-usb'))
         if self.disp_netvm:
