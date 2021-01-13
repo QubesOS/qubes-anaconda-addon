@@ -152,7 +152,7 @@ class QubesData(AddonData):
         self.usbvm_with_netvm = False
 
         self.custom_pool = False
-        self.vg_tpool = None
+        self.vg_tpool = self.get_default_tpool()
 
         self.skip = False
 
@@ -169,6 +169,60 @@ class QubesData(AddonData):
         self.qubes_user = None
 
         self.seen = False
+
+    def get_default_tpool(self):
+        # get VG / pool where root filesystem lives
+        fs_stat = os.stat("/")
+        fs_major = (fs_stat.st_dev & 0xff00) >> 8
+        fs_minor = fs_stat.st_dev & 0xff
+
+        try:
+            root_table = subprocess.check_output(["dmsetup",
+                "-j", str(fs_major), "-m", str(fs_minor),
+                "table"], stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            return None
+
+        _start, _sectors, target_type, target_args = \
+            root_table.decode().split(" ", 3)
+        if target_type not in ("thin", "linear"):
+            return None
+
+        lower_devnum, _args = target_args.split(" ")
+        with open("/sys/dev/block/{}/dm/name"
+            .format(lower_devnum), "r") as lower_devname_f:
+            lower_devname = lower_devname_f.read().rstrip('\n')
+        if lower_devname.endswith("-tpool"):
+            # LVM replaces '-' by '--' if name contains
+            # a hyphen
+            lower_devname = lower_devname.replace('--', '=')
+            volume_group, thin_pool, _tpool = \
+                lower_devname.rsplit("-", 2)
+            volume_group = volume_group.replace('=', '-')
+            thin_pool = thin_pool.replace('=', '-')
+        else:
+            lower_devname = lower_devname.replace('--', '=')
+            volume_group, _lv_name = \
+                lower_devname.rsplit("-", 1)
+            volume_group = volume_group.replace('=', '-')
+            thin_pool = None
+
+        if thin_pool in (None, "root-pool"):
+            # search for "vm-pool" in the same VG
+            try:
+                cmd = ['lvs', '--noheadings',
+                       '{}/vm-pool'.format(volume_group)]
+                subprocess.check_call(cmd, stdout=subprocess.DEVNULL,
+                                      stderr=subprocess.DEVNULL)
+            except subprocess.CalledProcessError:
+                return None
+            else:
+                thin_pool = 'vm-pool'
+
+        if volume_group and thin_pool:
+            return volume_group, thin_pool
+        
+        return None
 
     def handle_header(self, lineno, args):
         pass
