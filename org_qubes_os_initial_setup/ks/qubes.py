@@ -392,7 +392,7 @@ class QubesData(AddonData):
             template_name = '%s-%s' % (template, template_version)
             self.set_stage("Installing TemplateVM %s" % template_name)
             rpm = get_template_rpm(template)
-            self.run_command(['/usr/bin/rpm', '-i', rpm])
+            self.run_command(['/usr/bin/qvm-template', 'install', '--nogpgcheck', rpm])
 
         # Clean RPM after install of selected ones
         shutil.rmtree(TEMPLATES_RPM_PATH)
