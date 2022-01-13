@@ -66,7 +66,22 @@ def is_package_installed(pkgname):
 def usb_keyboard_present():
     context = pyudev.Context()
     keyboards = context.list_devices(subsystem='input', ID_INPUT_KEYBOARD='1')
-    return any([d.get('ID_USB_INTERFACES', False) for d in keyboards])
+    # allow sys-usb even if USB keyboard is present, as long as its connected
+    # to a controller that remains in dom0
+    dom0_controllers = []
+    with open('/proc/cmdline') as cmdline:
+        for opt in cmdline.read().split():
+            if opt.startswith('rd.qubes.dom0_usb='):
+                dom0_controllers.extend(opt.split('=', 1)[1].split(','))
+    for kbd in keyboards:
+        if not kbd.get('ID_USB_INTERFACES', False):
+            continue
+        for dom0_usb in dom0_controllers:
+            if kbd.get('ID_PATH', '').startswith('pci-0000:' + dom0_usb + '-'):
+                break
+        else:
+             return True
+    return False
 
 
 def started_from_usb():
