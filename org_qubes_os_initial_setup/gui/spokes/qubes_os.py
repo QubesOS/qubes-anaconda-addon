@@ -415,6 +415,12 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             dependencies=[self.choice_usb],
             indent=True
         )
+        self.choice_allow_usb_mouse = QubesChoice(
+            location=self.mainBox,
+            label=_("Automatically accept USB mice (discouraged)"),
+            dependencies=[self.choice_usb],
+            indent=True
+        )
 
         if self.qubes_data.whonix_available:
             self.choice_whonix = QubesChoice(
@@ -550,6 +556,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.choice_usb.set_selected(self.qubes_data.usbvm)
         self.choice_usb_with_netvm.set_selected(
             self.qubes_data.usbvm_with_netvm)
+        self.choice_allow_usb_mouse.set_selected(self.qubes_data.allow_usb_mouse)
 
         self.choice_custom_pool.set_selected(self.qubes_data.custom_pool)
         if self.qubes_data.vg_tpool and \
@@ -590,6 +597,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.qubes_data.usbvm = self.choice_usb.get_selected()
         self.qubes_data.usbvm_with_netvm = self.choice_usb_with_netvm.get_selected()
+        self.qubes_data.allow_usb_mouse = self.choice_allow_usb_mouse.get_selected()
 
         self.qubes_data.whonix_vms = self.choice_whonix.get_selected()
         self.qubes_data.whonix_default = self.choice_whonix_updates.get_selected()

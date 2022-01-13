@@ -163,6 +163,11 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
                 title=_('Use sys-net qube for both networking and USB devices'),
                 completed=self._usbvm_with_netvm)
             self._container.add(w, self._set_checkbox, '_usbvm_with_netvm')
+        if self._usbvm:
+            w = CheckboxWidget(
+                title=_('Automatically accept USB mice (discouraged)'),
+                completed=self._allow_usb_mouse)
+            self._container.add(w, self._set_checkbox, '_allow_usb_mouse')
 
         self.window.add_with_separator(self._container)
 
