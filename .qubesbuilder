@@ -1,0 +1,4 @@
+host:
+  rpm:
+    spec:
+    - qubes-anaconda-addon.spec
