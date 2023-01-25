@@ -253,10 +253,14 @@ class QubesData(AddonData):
         :return:
         """
 
+        line = line.strip()
         try:
-            (param, value) = line.strip().split(maxsplit=1)
+            (param, value) = line.split(maxsplit=1)
         except ValueError:
-            raise KickstartValueError('invalid line: %s' % line)
+            if ' ' not in line:
+                param, value = line, ""
+            else:
+                raise KickstartValueError('invalid line: %s' % line)
         if param in self.bool_options:
             if value.lower() not in ('true', 'false'):
                 raise KickstartValueError(
@@ -266,7 +270,7 @@ class QubesData(AddonData):
         elif param == 'default_template':
             self.default_template = value
         elif param == 'templates_to_install':
-            self.templates_to_install = value.split(' ')
+            self.templates_to_install = [t for t in value.split(' ') if t]
         elif param == 'lvm_pool':
             parsed = value.split('/')
             if len(parsed) != 2:
@@ -283,7 +287,8 @@ class QubesData(AddonData):
         for param in self.bool_options:
             section += "{} {!s}\n".format(param, getattr(self, param))
 
-        section += 'default_template {}\n'.format(self.default_template)
+        if self.default_template:
+            section += 'default_template {}\n'.format(self.default_template)
         section += 'templates_to_install {}\n'.format(' '.join(self.templates_to_install))
 
         if self.vg_tpool:
@@ -383,7 +388,8 @@ class QubesData(AddonData):
     def configure_default_kernel(self):
         self.set_stage("Setting up default kernel")
         installed_kernels = os.listdir('/var/lib/qubes/vm-kernels')
-        installed_kernels = [distutils.version.LooseVersion(x) for x in installed_kernels]
+        installed_kernels = [distutils.version.LooseVersion(x) for x in installed_kernels
+                             if x[0].isdigit()]
         default_kernel = str(sorted(installed_kernels)[-1])
         self.run_command([
             '/usr/bin/qubes-prefs', 'default-kernel', default_kernel])
@@ -396,9 +402,19 @@ class QubesData(AddonData):
         #    use custom thin pool to use
         if self.vg_tpool:
             volume_group, thin_pool = self.vg_tpool
-            self.run_command(['/usr/bin/qvm-pool', '--add', thin_pool, 'lvm_thin',
-                              '-o', 'volume_group={volume_group},thin_pool={thin_pool},revisions_to_keep=2'.format(
-                    volume_group=volume_group, thin_pool=thin_pool)])
+
+            sys_root = conf.target.system_root
+
+            cmd = util.startProgram(["qvm-pool", "info", thin_pool],
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                root=sys_root)
+            cmd.wait()
+            if cmd.returncode != 0:
+                # create only if doesn't exist already
+                self.run_command(['/usr/bin/qvm-pool', '--add', thin_pool, 'lvm_thin',
+                                  '-o', 'volume_group={volume_group},thin_pool={thin_pool},revisions_to_keep=2'.format(
+                        volume_group=volume_group, thin_pool=thin_pool)])
             self.run_command([
                 '/usr/bin/qubes-prefs', 'default-pool', thin_pool])
 
@@ -414,7 +430,8 @@ class QubesData(AddonData):
             self.run_command(['/usr/bin/qvm-template', 'install', '--nogpgcheck', rpm])
 
         # Clean RPM after install of selected ones
-        shutil.rmtree(TEMPLATES_RPM_PATH)
+        if os.path.exists(TEMPLATES_RPM_PATH):
+            shutil.rmtree(TEMPLATES_RPM_PATH)
 
     def configure_dom0(self):
         self.set_stage("Setting up administration VM (dom0)")
@@ -496,9 +513,10 @@ class QubesData(AddonData):
     def configure_default_dvm(self):
         self.set_stage("Creating default DisposableVM")
 
-        dispvm_name = self.default_template + '-dvm'
-        self.run_command(['/usr/bin/qubes-prefs', 'default-dispvm',
-            dispvm_name])
+        if self.default_template:
+            dispvm_name = self.default_template + '-dvm'
+            self.run_command(['/usr/bin/qubes-prefs', 'default-dispvm',
+                dispvm_name])
 
     def configure_network(self):
         self.set_stage('Setting up networking')
