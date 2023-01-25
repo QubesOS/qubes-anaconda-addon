@@ -120,7 +120,7 @@ class QubesData(AddonData):
     bool_options = (
         'system_vms', 'disp_firewallvm_and_usbvm', 'disp_netvm','default_vms',
         'whonix_vms', 'whonix_default', 'usbvm', 'usbvm_with_netvm', 'skip',
-        'allow_usb_mouse',
+        'allow_usb_mouse', 'allow_usb_keyboard',
     )
 
     def __init__(self, name):
@@ -152,8 +152,7 @@ class QubesData(AddonData):
             self.templates_versions['whonix'] = get_template_version('whonix-ws')
             self.templates_aliases['whonix'] = 'Whonix %s' % self.templates_versions['whonix']
 
-        self.usbvm_available = (
-                not usb_keyboard_present() and not started_from_usb())
+        self.usbvm_available = not started_from_usb()
         self.system_vms = True
 
         self.disp_firewallvm_and_usbvm = True
@@ -167,6 +166,7 @@ class QubesData(AddonData):
         self.usbvm = self.usbvm_available
         self.usbvm_with_netvm = False
         self.allow_usb_mouse = False
+        self.allow_usb_keyboard = usb_keyboard_present()
 
         self.custom_pool = False
         self.vg_tpool = self.get_default_tpool()
@@ -454,6 +454,8 @@ class QubesData(AddonData):
             states.append('pillar.qvm.sys-net-as-usbvm')
         if self.allow_usb_mouse:
             states.append('pillar.qvm.sys-usb-allow-mouse')
+        if self.allow_usb_keyboard:
+            states.append('pillar.qvm.usb-keyboard')
 
         try:
             # get rid of initial entries (from package installation time)
