@@ -115,6 +115,28 @@ class QubesChoice(QubesChoiceBase):
         self.set_sensitive(self.are_dependencies_selected())
 
 
+class ChoiceMessage(QubesChoiceBase):
+
+    def __init__(self, location=None, indent=False, choice_type=None, icon_name=None):
+        self.widget = Gtk.Box()
+        if icon_name:
+            icon = Gtk.IconTheme.get_default().load_icon(icon_name, 30, 0)
+            icon_img = Gtk.Image.new_from_pixbuf(icon)
+            self.widget.pack_start(icon_img, False, False, 0)
+        self.label_widget = Gtk.Label()
+        self.label_widget.set_xalign(0)
+        self.label_widget.set_padding(0, 10)
+        self.label_widget.set_line_wrap(True)
+        self.widget.pack_start(self.label_widget, False, True, 10)
+        self.widget.show_all()
+        self.widget.set_no_show_all(True)
+        super().__init__(widget=self.widget,
+                         location=location,
+                         indent=indent,
+                         choice_type=choice_type)
+        choices_instances.append(self)
+
+
 class DisabledChoice(QubesChoice):
 
     def __init__(self, location, label, indent=False):
@@ -427,6 +449,11 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             dependencies=[self.choice_usb],
             indent=True
         )
+        self.usb_keyboards_list = ChoiceMessage(
+            location=self.mainBox,
+            indent=True,
+            icon_name='help-about',
+        )
 
         if self.qubes_data.whonix_available:
             self.choice_whonix = QubesChoice(
@@ -564,6 +591,14 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             self.qubes_data.usbvm_with_netvm)
         self.choice_allow_usb_mouse.set_selected(self.qubes_data.allow_usb_mouse)
         self.choice_allow_usb_keyboard.set_selected(self.qubes_data.allow_usb_keyboard)
+        if self.qubes_data.usb_keyboards_detected:
+            self.usb_keyboards_list.label_widget.set_markup(
+                _("<b>INFO:</b> the following USB keyboards will be connected to sys-usb:\n{}\n"
+                  "<b>If you disable the option above, they will not function in Qubes.</b>").format(
+                    '\n'.join('- {}'.format(k) for k in self.qubes_data.usb_keyboards_detected)
+                ))
+        self.usb_keyboards_list.widget.set_visible(
+            bool(self.qubes_data.usb_keyboards_detected))
 
         self.choice_custom_pool.set_selected(self.qubes_data.custom_pool)
         if self.qubes_data.vg_tpool and \

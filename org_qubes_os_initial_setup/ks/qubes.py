@@ -66,13 +66,14 @@ def is_package_installed(pkgname):
 def usb_keyboard_present():
     context = pyudev.Context()
     keyboards = context.list_devices(subsystem='input', ID_INPUT_KEYBOARD='1')
-    # allow sys-usb even if USB keyboard is present, as long as its connected
+    # allow sys-usb even if USB keyboard is present, as long as it's connected
     # to a controller that remains in dom0
     dom0_controllers = []
     with open('/proc/cmdline') as cmdline:
         for opt in cmdline.read().split():
             if opt.startswith('rd.qubes.dom0_usb='):
                 dom0_controllers.extend(opt.split('=', 1)[1].split(','))
+    usb_keyboards = []
     for kbd in keyboards:
         if not kbd.get('ID_USB_INTERFACES', False):
             continue
@@ -80,8 +81,8 @@ def usb_keyboard_present():
             if kbd.get('ID_PATH', '').startswith('pci-0000:' + dom0_usb + '-'):
                 break
         else:
-             return True
-    return False
+            usb_keyboards.append("{} {}".format(kbd.get('ID_VENDOR'), kbd.get('ID_MODEL')))
+    return usb_keyboards
 
 
 def started_from_usb():
@@ -163,10 +164,11 @@ class QubesData(AddonData):
         self.whonix_vms = self.whonix_available
         self.whonix_default = False
 
+        self.usb_keyboards_detected = usb_keyboard_present()
         self.usbvm = self.usbvm_available
         self.usbvm_with_netvm = False
         self.allow_usb_mouse = False
-        self.allow_usb_keyboard = usb_keyboard_present()
+        self.allow_usb_keyboard = bool(self.usb_keyboards_detected)
 
         self.custom_pool = False
         self.vg_tpool = self.get_default_tpool()
