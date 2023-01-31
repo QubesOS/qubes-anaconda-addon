@@ -28,7 +28,10 @@ from org_qubes_os_initial_setup.service.kickstart import \
     QubesKickstartSpecification, QubesData
 from org_qubes_os_initial_setup.service.qubes_interface import \
     QubesInitialSetupInterface
-from org_qubes_os_initial_setup.service.tasks import QubesInitialSetupTask
+from org_qubes_os_initial_setup.service.tasks import \
+    DefaultKernelTask, DefaultPoolTask, InstallTemplateTask, \
+    CleanTemplatePkgsTask, ConfigureDom0Task, SetDefaultTemplateTask, \
+    ConfigureDefaultQubesTask, CreateDefaultDVMTask, ConfigureNetworkTask
 from org_qubes_os_initial_setup.utils import is_template_rpm_available, \
     get_template_version, started_from_usb, usb_keyboard_present, \
     get_default_tpool
@@ -166,10 +169,40 @@ class QubesInitialSetup(KickstartService):
             log.warning("Whonix selected but not available")
             self.whonix_vms = False
 
-        task = QubesInitialSetupTask(
-            **{attr: getattr(self, attr) for attr in self.properties}
+        start_usb = self.usbvm and not self.usbvm_with_netvm
+        # resolve template version, if kickstart doesn't include it already
+        if not any(x.isdigit() for x in self.default_template):
+            default_template = '%s-%s' % (
+                self.default_template, get_template_version(self.default_template))
+        else:
+            default_template = self.default_template
+
+        tasks = []
+        tasks.append(DefaultKernelTask())
+        tasks.append(DefaultPoolTask(vg_tpool=self.vg_tpool))
+        for template in self.templates_to_install:
+            tasks.append(InstallTemplateTask(template=template))
+        tasks.append(CleanTemplatePkgsTask())
+        tasks.append(ConfigureDom0Task())
+        tasks.append(SetDefaultTemplateTask(default_template=default_template))
+        tasks.append(ConfigureDefaultQubesTask(
+            system_vms=self.system_vms,
+            usbvm=self.usbvm,
+            usbvm_with_netvm=self.usbvm_with_netvm,
+            disp_firewallvm_and_usbvm=self.disp_firewallvm_and_usbvm,
+            allow_usb_keyboard=self.allow_usb_keyboard,
+            allow_usb_mouse=self.allow_usb_mouse,
+            whonix_default=self.whonix_default,
+            whonix_vms=self.whonix_vms,
+            default_vms=self.default_vms,
+            disp_netvm=self.disp_netvm,
+        ))
+        tasks.append(CreateDefaultDVMTask(default_template=default_template))
+        tasks.append(ConfigureNetworkTask(
+            whonix_default=self.whonix_default,
+            start_usb=start_usb)
         )
-        return [task]
+        return tasks
 
     def configure_with_tasks(self):
         return super().configure_with_tasks()
