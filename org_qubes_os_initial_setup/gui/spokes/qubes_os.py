@@ -631,7 +631,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         for key, val in self.qubes_data.templates_aliases.items():
             if self.choice_default_template.get_entry() == val:
                 self.qubes_data.default_template = key
-                continue
+                break
 
         self.qubes_data.system_vms = self.choice_system.get_selected()
 
