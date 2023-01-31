@@ -22,6 +22,7 @@
 #
 
 """Module with the QubesOsSpoke class."""
+from org_qubes_os_initial_setup.utils import CamelCaseWrap
 
 # will never be translated
 _ = lambda x: x
@@ -40,6 +41,7 @@ from gi.repository import Gtk
 from pyanaconda.ui.categories.system import SystemCategory
 from pyanaconda.ui.gui.spokes import NormalSpoke
 from pyanaconda.ui.common import FirstbootOnlySpokeMixIn
+from org_qubes_os_initial_setup.constants import QUBES_INITIAL_SETUP
 
 # export only the spoke, no helper functions, classes or constants
 __all__ = ["QubesOsSpoke"]
@@ -331,15 +333,17 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         NormalSpoke.__init__(self, data, storage, payload)
 
+        self.qubes_data = CamelCaseWrap(QUBES_INITIAL_SETUP.get_proxy())
         self.logger = logging.getLogger("anaconda")
-        self.qubes_data = self.data.addons.org_qubes_os_initial_setup
 
+        # TODO: consider moving to initialize()
         self.templatesBox = self.builder.get_object("templatesBox")
         self.mainBox = self.builder.get_object("mainBox")
         self.advancedBox = self.builder.get_object("advancedBox")
 
         self.lvm_cache = self.init_cache()
         self.thin_pools = None
+        self.seen = False
 
         self.init_qubes_choices()
 
@@ -546,7 +550,6 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         """
 
         NormalSpoke.initialize(self)
-        self.qubes_data.gui_mode = True
 
     def refresh(self):
         """
@@ -616,14 +619,15 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.qubes_data.skip = self.check_advanced.get_selected()
 
-        self.qubes_data.templates_to_install = []
+        templates_to_install = []
         if self.choice_install_fedora.get_selected():
-            self.qubes_data.templates_to_install.append('fedora')
+            templates_to_install.append('fedora')
         if self.choice_install_debian.get_selected():
-            self.qubes_data.templates_to_install.append('debian')
+            templates_to_install.append('debian')
         if self.choice_install_whonix.get_selected():
-            self.qubes_data.templates_to_install += ['whonix-gw', 'whonix-ws']
+            templates_to_install += ['whonix-gw', 'whonix-ws']
 
+        self.qubes_data.templates_to_install = templates_to_install
         for key, val in self.qubes_data.templates_aliases.items():
             if self.choice_default_template.get_entry() == val:
                 self.qubes_data.default_template = key
@@ -644,14 +648,13 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.qubes_data.whonix_vms = self.choice_whonix.get_selected()
         self.qubes_data.whonix_default = self.choice_whonix_updates.get_selected()
 
-        self.qubes_data.custom_pool = self.choice_custom_pool.get_selected()
         if self.choice_pool_list and \
                 self.choice_pool_list.get_vgroup() and \
                 self.choice_pool_list.get_tpool():
             self.qubes_data.vg_tpool = (self.choice_pool_list.get_vgroup(),
                                         self.choice_pool_list.get_tpool())
 
-        self.qubes_data.seen = True
+        self.seen = True
 
     @property
     def ready(self):
@@ -676,7 +679,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         """
 
-        return self.qubes_data.seen
+        return self.seen
 
     @property
     def mandatory(self):

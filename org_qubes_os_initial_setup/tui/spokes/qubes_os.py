@@ -19,6 +19,9 @@
 #
 
 """Module with the class for the Qubes OS TUI spoke."""
+from org_qubes_os_initial_setup.constants import QUBES_INITIAL_SETUP
+from org_qubes_os_initial_setup.service.kickstart import QubesData
+from org_qubes_os_initial_setup.utils import CamelCaseWrap
 
 # import gettext
 # _ = lambda x: gettext.ldgettext("qubes-os-anaconda-plugin", x)
@@ -79,9 +82,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
 
         self._container = None
 
-        self.qubes_data = self.data.addons.org_qubes_os_initial_setup
+        self.qubes_data = CamelCaseWrap(QUBES_INITIAL_SETUP.get_proxy())
 
-        for attr in self.qubes_data.bool_options:
+        for attr in QubesData.bool_options:
             setattr(self, '_' + attr, getattr(self.qubes_data, attr))
 
         self.initialize_done()

@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.fedoraproject.Anaconda.Addons.QubesInitialSetup
+Exec=/usr/libexec/anaconda/start-module org_qubes_os_initial_setup.service
+User=root

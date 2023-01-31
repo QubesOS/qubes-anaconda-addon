@@ -25,12 +25,18 @@ at first boot time.
 %install
 rm -rf $RPM_BUILD_ROOT
 
+install -m0644 -D dbus/org_qubes_os_initial_setup.conf \
+    $RPM_BUILD_ROOT/%{_datadir}/anaconda/dbus/confs/org_qubes_os_initial_setup.conf
+install -m0644 -D dbus/org_qubes_os_initial_setup.service \
+    $RPM_BUILD_ROOT/%{_datadir}/anaconda/dbus/services/org_qubes_os_initial_setup.service
 install -d $RPM_BUILD_ROOT/%{_datadir}/anaconda/addons
 cp -a org_qubes_os_initial_setup $RPM_BUILD_ROOT/%{_datadir}/anaconda/addons/
 
 %files
 %defattr(-,root,root,-)
 %doc LICENSE README
+%{_datadir}/anaconda/dbus/confs/org_qubes_os_initial_setup.conf
+%{_datadir}/anaconda/dbus/services/org_qubes_os_initial_setup.service
 %dir %{_datadir}/anaconda/addons/org_qubes_os_initial_setup
 %{_datadir}/anaconda/addons/org_qubes_os_initial_setup/*
 
