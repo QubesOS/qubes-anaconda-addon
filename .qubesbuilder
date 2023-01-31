@@ -1,4 +1,4 @@
-host:
+host-fc37:
   rpm:
     build:
     - qubes-anaconda-addon.spec
