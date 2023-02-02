@@ -171,7 +171,8 @@ class QubesInitialSetup(KickstartService):
 
         start_usb = self.usbvm and not self.usbvm_with_netvm
         # resolve template version, if kickstart doesn't include it already
-        if not any(x.isdigit() for x in self.default_template):
+        if self.default_template and \
+                not any(x.isdigit() for x in self.default_template):
             default_template = '%s-%s' % (
                 self.default_template, get_template_version(self.default_template))
         else:
@@ -184,7 +185,8 @@ class QubesInitialSetup(KickstartService):
             tasks.append(InstallTemplateTask(template=template))
         tasks.append(CleanTemplatePkgsTask())
         tasks.append(ConfigureDom0Task())
-        tasks.append(SetDefaultTemplateTask(default_template=default_template))
+        if default_template:
+            tasks.append(SetDefaultTemplateTask(default_template=default_template))
         tasks.append(ConfigureDefaultQubesTask(
             system_vms=self.system_vms,
             usbvm=self.usbvm,
@@ -197,7 +199,8 @@ class QubesInitialSetup(KickstartService):
             default_vms=self.default_vms,
             disp_netvm=self.disp_netvm,
         ))
-        tasks.append(CreateDefaultDVMTask(default_template=default_template))
+        if default_template:
+            tasks.append(CreateDefaultDVMTask(default_template=default_template))
         tasks.append(ConfigureNetworkTask(
             whonix_default=self.whonix_default,
             start_usb=start_usb)
