@@ -169,6 +169,9 @@ class QubesInitialSetup(KickstartService):
             log.warning("Whonix selected but not available")
             self.whonix_vms = False
 
+        if self.skip:
+            return []
+
         start_usb = self.usbvm and not self.usbvm_with_netvm
         # resolve template version, if kickstart doesn't include it already
         if self.default_template and \
