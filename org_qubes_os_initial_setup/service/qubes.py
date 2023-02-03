@@ -173,8 +173,13 @@ class QubesInitialSetup(KickstartService):
         # resolve template version, if kickstart doesn't include it already
         if self.default_template and \
                 not any(x.isdigit() for x in self.default_template):
-            default_template = '%s-%s' % (
-                self.default_template, get_template_version(self.default_template))
+            template_version = get_template_version(self.default_template)
+            if template_version is not None:
+                default_template = '%s-%s' % (
+                    self.default_template, get_template_version(self.default_template))
+            else:
+                log.warning("Template '%s' not found", self.default_template)
+                default_template = None
         else:
             default_template = self.default_template
 
