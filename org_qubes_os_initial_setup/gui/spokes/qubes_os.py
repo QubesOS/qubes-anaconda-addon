@@ -50,13 +50,15 @@ choices_instances = []
 
 class QubesChoiceBase:
 
-    def __init__(self, widget, location=None, indent=False, choice_type=None):
+    def __init__(self, widget, location=None, indent=False, choice_type=None,
+                 dependencies=None):
         self.widget = widget
         self.location = location
         self.indent = indent
         self.choice_type = choice_type
         self.selected = None
         self._can_be_sensitive = True
+        self.dependencies = dependencies
 
         if self.indent:
             self.outer_widget = Gtk.Alignment()
@@ -92,13 +94,13 @@ class QubesChoice(QubesChoiceBase):
         self.location = location
         self.label = label
         self.widget = Gtk.CheckButton(label=self.label)
-        self.dependencies = dependencies
         self.choice_type = choice_type
         self.selected = None
         super(QubesChoice, self).__init__(widget=self.widget,
                                           location=location,
                                           choice_type=choice_type,
-                                          indent=indent)
+                                          indent=indent,
+                                          dependencies=dependencies)
         if self.dependencies:
             for dependency in self.dependencies:
                 if isinstance(dependency.widget, Gtk.CheckButton):
@@ -178,8 +180,8 @@ class QubesChoiceTemplate(QubesChoiceBase):
         for entry in entries:
             self.widget.append_text(entry)
 
-        super(QubesChoiceTemplate, self).__init__(widget=self.widget)
-        self.dependencies = dependencies
+        super(QubesChoiceTemplate, self).__init__(widget=self.widget,
+                                                  dependencies=dependencies)
 
         if self.dependencies:
             for dependency in self.dependencies:
@@ -227,8 +229,8 @@ class QubesChoicePool(QubesChoiceBase):
             for key, val in pools:
                 self.pools[key] = self.pools.get(key, ()) + (val,)
 
-        super(QubesChoicePool, self).__init__(widget=self.widget)
-        self.dependencies = dependencies
+        super(QubesChoicePool, self).__init__(widget=self.widget,
+                                              dependencies=dependencies)
 
         if self.dependencies:
             for dependency in self.dependencies:
