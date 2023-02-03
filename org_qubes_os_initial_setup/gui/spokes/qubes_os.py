@@ -612,6 +612,8 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             self.choice_pool_list.set_vgroup(vg)
             self.choice_pool_list.set_tpool(tpool)
 
+        self.check_advanced.set_selected(self.qubes_data.skip)
+
     def apply(self):
         """
         The apply method that is called when the spoke is left. It should
