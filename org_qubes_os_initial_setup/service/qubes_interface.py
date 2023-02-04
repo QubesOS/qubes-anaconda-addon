@@ -34,8 +34,8 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
         super().connect_signals()
         for attr in self.implementation.properties:
             self.watch_property(
-                to_camel_case(attr),
-                getattr(self.implementation, attr + "_changed"))
+                to_camel_case(attr), getattr(self.implementation, attr + "_changed")
+            )
 
     def _prop_getter(self, attr):
         return getattr(self.implementation, attr)
@@ -48,30 +48,30 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
     # builtins.property, it needs proper type hints, etc)
     # the below section is generated with the following code:
 
-# for attr, ty in (
-#             ("system_vms", "Bool"),
-#             ("disp_firewallvm_and_usbvm", "Bool"),
-#             ("disp_netvm", "Bool"),
-#             ("default_vms", "Bool"),
-#             ("whonix_vms", "Bool"),
-#             ("whonix_default", "Bool"),
-#             ("usbvm", "Bool"),
-#             ("usbvm_with_netvm", "Bool"),
-#             ("skip", "Bool"),
-#             ("allow_usb_mouse", "Bool"),
-#             ("allow_usb_keyboard", "Bool"),
-#             ("vg_tpool", "Tuple[str, str]"),
-#             ("templates_to_install", "List[str]"),
-#             ("default_template", "str"),
-#     ):
-#         print(f"""
-#     @property
-#     def {to_camel_case(attr)}(self) -> {ty}:
-#         return self.implementation.{attr}
-#
-#     @{to_camel_case(attr)}.setter
-#     def {to_camel_case(attr)}(self, value: {ty}):
-#         self.implementation.{attr} = value""")
+    # for attr, ty in (
+    #             ("system_vms", "Bool"),
+    #             ("disp_firewallvm_and_usbvm", "Bool"),
+    #             ("disp_netvm", "Bool"),
+    #             ("default_vms", "Bool"),
+    #             ("whonix_vms", "Bool"),
+    #             ("whonix_default", "Bool"),
+    #             ("usbvm", "Bool"),
+    #             ("usbvm_with_netvm", "Bool"),
+    #             ("skip", "Bool"),
+    #             ("allow_usb_mouse", "Bool"),
+    #             ("allow_usb_keyboard", "Bool"),
+    #             ("vg_tpool", "Tuple[str, str]"),
+    #             ("templates_to_install", "List[str]"),
+    #             ("default_template", "str"),
+    #     ):
+    #         print(f"""
+    #     @property
+    #     def {to_camel_case(attr)}(self) -> {ty}:
+    #         return self.implementation.{attr}
+    #
+    #     @{to_camel_case(attr)}.setter
+    #     def {to_camel_case(attr)}(self, value: {ty}):
+    #         self.implementation.{attr} = value""")
 
     @property
     def SystemVms(self) -> Bool:
@@ -112,7 +112,6 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
     @WhonixVms.setter
     def WhonixVms(self, value: Bool):
         self.implementation.whonix_vms = value
-
 
     @property
     def WhonixDefault(self) -> Bool:

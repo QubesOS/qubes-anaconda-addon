@@ -27,10 +27,10 @@ from pyanaconda.core.configuration.anaconda import conf
 from pyanaconda.modules.common.task import Task
 
 from org_qubes_os_initial_setup.constants import TEMPLATES_RPM_PATH
-from org_qubes_os_initial_setup.utils import get_template_version, \
-    get_template_rpm
+from org_qubes_os_initial_setup.utils import get_template_version, get_template_rpm
 
 log = logging.getLogger(__name__)
+
 
 class BaseQubesTask(Task):
     def run_command(self, command, stdin=None, ignore_failure=False):
@@ -42,10 +42,9 @@ class BaseQubesTask(Task):
         try:
             sys_root = conf.target.system_root
 
-            cmd = util.startProgram(command,
-                stderr=subprocess.PIPE,
-                stdin=stdin,
-                root=sys_root)
+            cmd = util.startProgram(
+                command, stderr=subprocess.PIPE, stdin=stdin, root=sys_root
+            )
 
             (stdout, stderr) = cmd.communicate()
 
@@ -53,7 +52,9 @@ class BaseQubesTask(Task):
             stderr = stderr.decode("utf-8")
 
             if not ignore_failure and cmd.returncode != 0:
-                process_error = "{} failed:\nstdout: \"{}\"\nstderr: \"{}\"".format(command, stdout, stderr)
+                process_error = '{} failed:\nstdout: "{}"\nstderr: "{}"'.format(
+                    command, stdout, stderr
+                )
 
         except Exception as e:
             process_error = str(e)
@@ -71,12 +72,15 @@ class DefaultKernelTask(BaseQubesTask):
         return "Setup up default kernel"
 
     def run(self):
-        installed_kernels = os.listdir('/var/lib/qubes/vm-kernels')
-        installed_kernels = [distutils.version.LooseVersion(x) for x in installed_kernels
-                             if x[0].isdigit()]
+        installed_kernels = os.listdir("/var/lib/qubes/vm-kernels")
+        installed_kernels = [
+            distutils.version.LooseVersion(x)
+            for x in installed_kernels
+            if x[0].isdigit()
+        ]
         default_kernel = str(sorted(installed_kernels)[-1])
-        self.run_command([
-            '/usr/bin/qubes-prefs', 'default-kernel', default_kernel])
+        self.run_command(["/usr/bin/qubes-prefs", "default-kernel", default_kernel])
+
 
 class DefaultPoolTask(BaseQubesTask):
     def __init__(self, vg_tpool):
@@ -97,22 +101,31 @@ class DefaultPoolTask(BaseQubesTask):
 
             sys_root = conf.target.system_root
 
-            cmd = util.startProgram(["qvm-pool", "info", thin_pool],
+            cmd = util.startProgram(
+                ["qvm-pool", "info", thin_pool],
                 stderr=subprocess.DEVNULL,
                 stdin=subprocess.DEVNULL,
-                root=sys_root)
+                root=sys_root,
+            )
             cmd.wait()
             if cmd.returncode != 0:
                 # create only if doesn't exist already
-                self.run_command(['/usr/bin/qvm-pool', '--add', thin_pool, 'lvm_thin',
-                                  '-o', 'volume_group={volume_group},thin_pool={thin_pool},revisions_to_keep=2'.format(
-                        volume_group=volume_group, thin_pool=thin_pool)])
-            self.run_command([
-                '/usr/bin/qubes-prefs', 'default-pool', thin_pool])
+                self.run_command(
+                    [
+                        "/usr/bin/qvm-pool",
+                        "--add",
+                        thin_pool,
+                        "lvm_thin",
+                        "-o",
+                        "volume_group={volume_group},thin_pool={thin_pool},revisions_to_keep=2".format(
+                            volume_group=volume_group, thin_pool=thin_pool
+                        ),
+                    ]
+                )
+            self.run_command(["/usr/bin/qubes-prefs", "default-pool", thin_pool])
 
 
 class InstallTemplateTask(BaseQubesTask):
-
     def __init__(self, template):
         super().__init__()
         self.template = template
@@ -123,14 +136,14 @@ class InstallTemplateTask(BaseQubesTask):
 
     def run(self):
         template = self.template
-        if template.startswith('whonix'):
-            template_version = get_template_version('whonix-ws')
+        if template.startswith("whonix"):
+            template_version = get_template_version("whonix-ws")
         else:
             template_version = get_template_version(template)
-        template_name = '%s-%s' % (template, template_version)
+        template_name = "%s-%s" % (template, template_version)
         self.report_progress("Installing TemplateVM %s" % template_name)
         rpm = get_template_rpm(template)
-        self.run_command(['/usr/bin/qvm-template', 'install', '--nogpgcheck', rpm])
+        self.run_command(["/usr/bin/qvm-template", "install", "--nogpgcheck", rpm])
 
 
 class CleanTemplatePkgsTask(BaseQubesTask):
@@ -143,15 +156,21 @@ class CleanTemplatePkgsTask(BaseQubesTask):
         if os.path.exists(TEMPLATES_RPM_PATH):
             shutil.rmtree(TEMPLATES_RPM_PATH)
 
+
 class ConfigureDom0Task(BaseQubesTask):
     @property
     def name(self):
         return "Setup up administration VM (dom0)"
 
     def run(self):
-        for service in ['rdisc', 'kdump', 'libvirt-guests', 'salt-minion']:
-            self.run_command(['systemctl', 'disable', '{}.service'.format(service) ], ignore_failure=True)
-            self.run_command(['systemctl', 'stop',    '{}.service'.format(service) ], ignore_failure=True)
+        for service in ["rdisc", "kdump", "libvirt-guests", "salt-minion"]:
+            self.run_command(
+                ["systemctl", "disable", "{}.service".format(service)],
+                ignore_failure=True,
+            )
+            self.run_command(
+                ["systemctl", "stop", "{}.service".format(service)], ignore_failure=True
+            )
 
 
 class SetDefaultTemplateTask(BaseQubesTask):
@@ -165,22 +184,25 @@ class SetDefaultTemplateTask(BaseQubesTask):
 
     def run(self):
         if self.default_template:
-            self.run_command(['/usr/bin/qubes-prefs', 'default-template', self.default_template])
+            self.run_command(
+                ["/usr/bin/qubes-prefs", "default-template", self.default_template]
+            )
 
 
 class ConfigureDefaultQubesTask(BaseQubesTask):
-    def __init__(self,
-                 system_vms,
-                 usbvm,
-                 usbvm_with_netvm,
-                 disp_firewallvm_and_usbvm,
-                 allow_usb_keyboard,
-                 allow_usb_mouse,
-                 whonix_default,
-                 whonix_vms,
-                 default_vms,
-                 disp_netvm,
-                 ):
+    def __init__(
+        self,
+        system_vms,
+        usbvm,
+        usbvm_with_netvm,
+        disp_firewallvm_and_usbvm,
+        allow_usb_keyboard,
+        allow_usb_mouse,
+        whonix_default,
+        whonix_vms,
+        default_vms,
+        disp_netvm,
+    ):
         super().__init__()
         self.system_vms = system_vms
         self.usbvm = usbvm
@@ -200,64 +222,66 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
     def run(self):
         states = []
         if self.system_vms:
-            states.extend(
-                ('qvm.sys-net', 'qvm.sys-firewall', 'qvm.default-dispvm'))
+            states.extend(("qvm.sys-net", "qvm.sys-firewall", "qvm.default-dispvm"))
         if self.disp_firewallvm_and_usbvm:
             states.extend(
-                ('pillar.qvm.disposable-sys-firewall',
-                'pillar.qvm.disposable-sys-usb'))
+                ("pillar.qvm.disposable-sys-firewall", "pillar.qvm.disposable-sys-usb")
+            )
         if self.disp_netvm:
-            states.append('pillar.qvm.disposable-sys-net')
+            states.append("pillar.qvm.disposable-sys-net")
         if self.default_vms:
-            states.extend(
-                ('qvm.personal', 'qvm.work', 'qvm.untrusted', 'qvm.vault'))
+            states.extend(("qvm.personal", "qvm.work", "qvm.untrusted", "qvm.vault"))
         if self.whonix_vms:
-            states.extend(
-                ('qvm.sys-whonix', 'qvm.anon-whonix'))
+            states.extend(("qvm.sys-whonix", "qvm.anon-whonix"))
         if self.whonix_default:
-            states.append('qvm.updates-via-whonix')
+            states.append("qvm.updates-via-whonix")
         if self.usbvm:
-            states.append('qvm.sys-usb')
+            states.append("qvm.sys-usb")
         if self.usbvm_with_netvm:
-            states.append('pillar.qvm.sys-net-as-usbvm')
+            states.append("pillar.qvm.sys-net-as-usbvm")
         if self.allow_usb_mouse:
-            states.append('pillar.qvm.sys-usb-allow-mouse')
+            states.append("pillar.qvm.sys-usb-allow-mouse")
         if self.allow_usb_keyboard:
-            states.append('pillar.qvm.usb-keyboard')
+            states.append("pillar.qvm.usb-keyboard")
 
         try:
             # get rid of initial entries (from package installation time)
-            os.rename('/var/log/salt/minion', '/var/log/salt/minion.install')
+            os.rename("/var/log/salt/minion", "/var/log/salt/minion.install")
         except OSError:
             pass
 
         # Refresh minion configuration to make sure all installed formulas are included
-        self.run_command(['qubesctl', 'saltutil.clear_cache'])
-        self.run_command(['qubesctl', 'saltutil.sync_all'])
+        self.run_command(["qubesctl", "saltutil.clear_cache"])
+        self.run_command(["qubesctl", "saltutil.sync_all"])
 
         for state in states:
             print("Setting up state: {}".format(state))
-            if state.startswith('pillar.'):
-                self.run_command(['qubesctl', 'top.enable',
-                    state[len('pillar.'):], 'pillar=True'])
+            if state.startswith("pillar."):
+                self.run_command(
+                    ["qubesctl", "top.enable", state[len("pillar.") :], "pillar=True"]
+                )
             else:
-                self.run_command(['qubesctl', 'top.enable', state])
+                self.run_command(["qubesctl", "top.enable", state])
 
         try:
-            self.run_command(['qubesctl', '--all', 'state.highstate'])
+            self.run_command(["qubesctl", "--all", "state.highstate"])
             # After successful call disable all the states to not leave them
             # enabled, to not interfere with later user changes (like assigning
             # additional PCI devices)
             for state in states:
-                if not state.startswith('pillar.'):
-                    self.run_command(['qubesctl', 'top.disable', state])
+                if not state.startswith("pillar."):
+                    self.run_command(["qubesctl", "top.disable", state])
         except Exception:
             raise Exception(
-                    ("Qubes initial configuration failed. Login to the system and " +
-                     "check /var/log/salt/minion for details. " +
-                     "You can retry configuration by calling " +
-                     "'sudo qubesctl --all state.highstate' in dom0 (you will get " +
-                     "detailed state there)."))
+                (
+                    "Qubes initial configuration failed. Login to the system and "
+                    + "check /var/log/salt/minion for details. "
+                    + "You can retry configuration by calling "
+                    + "'sudo qubesctl --all state.highstate' in dom0 (you will get "
+                    + "detailed state there)."
+                )
+            )
+
 
 class CreateDefaultDVMTask(BaseQubesTask):
     def __init__(self, default_template):
@@ -270,9 +294,9 @@ class CreateDefaultDVMTask(BaseQubesTask):
 
     def run(self):
         if self.default_template:
-            dispvm_name = self.default_template + '-dvm'
-            self.run_command(['/usr/bin/qubes-prefs', 'default-dispvm',
-                dispvm_name])
+            dispvm_name = self.default_template + "-dvm"
+            self.run_command(["/usr/bin/qubes-prefs", "default-dispvm", dispvm_name])
+
 
 class ConfigureNetworkTask(BaseQubesTask):
     def __init__(self, whonix_default, start_usb):
@@ -286,16 +310,16 @@ class ConfigureNetworkTask(BaseQubesTask):
         return "Setup networking"
 
     def run(self):
-        default_netvm = 'sys-firewall'
+        default_netvm = "sys-firewall"
         updatevm = default_netvm
         if self.whonix_default:
-            updatevm = 'sys-whonix'
+            updatevm = "sys-whonix"
 
-        self.run_command(['/usr/bin/qvm-prefs', 'sys-firewall', 'netvm', 'sys-net'])
-        self.run_command(['/usr/bin/qubes-prefs', 'default-netvm', default_netvm])
-        self.run_command(['/usr/bin/qubes-prefs', 'updatevm', updatevm])
-        self.run_command(['/usr/bin/qubes-prefs', 'clockvm', 'sys-net'])
-        self.run_command(['/usr/bin/qvm-start', default_netvm])
+        self.run_command(["/usr/bin/qvm-prefs", "sys-firewall", "netvm", "sys-net"])
+        self.run_command(["/usr/bin/qubes-prefs", "default-netvm", default_netvm])
+        self.run_command(["/usr/bin/qubes-prefs", "updatevm", updatevm])
+        self.run_command(["/usr/bin/qubes-prefs", "clockvm", "sys-net"])
+        self.run_command(["/usr/bin/qvm-start", default_netvm])
         if self.start_usb:
             # Workaround for #1464 (so qvm.start from salt can't be used)
-            self.run_command(['systemctl', 'start', 'qubes-vm@sys-usb.service'])
+            self.run_command(["systemctl", "start", "qubes-vm@sys-usb.service"])

@@ -27,8 +27,7 @@ from pyanaconda.modules.common.constants.namespaces import ADDONS_NAMESPACE
 QUBES_OS_NAMESPACE = (*ADDONS_NAMESPACE, "QubesInitialSetup")
 
 QUBES_INITIAL_SETUP = DBusServiceIdentifier(
-    namespace=QUBES_OS_NAMESPACE,
-    message_bus=DBus
+    namespace=QUBES_OS_NAMESPACE, message_bus=DBus
 )
 
-TEMPLATES_RPM_PATH = '/var/lib/qubes/template-packages/'
+TEMPLATES_RPM_PATH = "/var/lib/qubes/template-packages/"

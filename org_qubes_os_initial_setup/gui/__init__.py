@@ -6,9 +6,9 @@ work.
 
 import gi
 
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
-gi.require_version('GLib', '2.0')
+gi.require_version("Gtk", "3.0")
+gi.require_version("Gdk", "3.0")
+gi.require_version("GLib", "2.0")
 
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -25,7 +25,7 @@ class ThreadDialog(Gtk.Dialog):
         self.set_modal(True)
         self.set_default_size(500, 100)
 
-        self.connect('delete-event', self.on_delete_event)
+        self.connect("delete-event", self.on_delete_event)
 
         self.progress = Gtk.ProgressBar()
         self.progress.set_pulse_step(100)
@@ -93,7 +93,12 @@ class ThreadDialog(Gtk.Dialog):
         self.run_in_ui_thread(self.showErrorMessageHelper, text)
 
     def showErrorMessageHelper(self, text):
-        dlg = Gtk.MessageDialog(title="Error", message_type=Gtk.MessageType.ERROR, buttons=Gtk.ButtonsType.OK, text=text)
+        dlg = Gtk.MessageDialog(
+            title="Error",
+            message_type=Gtk.MessageType.ERROR,
+            buttons=Gtk.ButtonsType.OK,
+            text=text,
+        )
         dlg.set_position(Gtk.WindowPosition.CENTER)
         dlg.set_modal(True)
         dlg.set_transient_for(self)

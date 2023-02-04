@@ -21,9 +21,11 @@ data/*.service
 """
 
 from pyanaconda.modules.common import init
+
 init()  # must be called before importing the service code
 
 # pylint:disable=wrong-import-position
 from org_qubes_os_initial_setup.service.qubes import QubesInitialSetup
+
 service = QubesInitialSetup()
 service.run()

@@ -40,6 +40,7 @@ from pyanaconda.ui.common import FirstbootOnlySpokeMixIn
 # export only the HelloWorldSpoke and HelloWorldEditSpoke classes
 __all__ = ["QubesOsSpoke"]
 
+
 class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
     """
     Since this class inherits from the FirstbootOnlySpokeMixIn, it will
@@ -53,7 +54,6 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
     """
 
     ### class attributes defined by API ###
-
 
     # category this spoke belongs to
     category = SystemCategory
@@ -85,10 +85,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
         self.qubes_data = CamelCaseWrap(QUBES_INITIAL_SETUP.get_proxy())
 
         for attr in QubesData.bool_options:
-            setattr(self, '_' + attr, getattr(self.qubes_data, attr))
+            setattr(self, "_" + attr, getattr(self.qubes_data, attr))
 
         self.initialize_done()
-
 
     def initialize(self):
         """
@@ -124,53 +123,66 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
         super(QubesOsSpoke, self).refresh()
         self._container = ListColumnContainer(1)
 
-        w = CheckboxWidget(title=_('Create default system qubes '
-                                   '(sys-net, sys-firewall, default DispVM)'),
-                           completed=self._system_vms)
-        self._container.add(w, self._set_checkbox, '_system_vms')
+        w = CheckboxWidget(
+            title=_(
+                "Create default system qubes " "(sys-net, sys-firewall, default DispVM)"
+            ),
+            completed=self._system_vms,
+        )
+        self._container.add(w, self._set_checkbox, "_system_vms")
         if self._system_vms:
             w = CheckboxWidget(
-                title=_('Make sys-firewall and sys-usb disposable'),
-                completed=self._disp_firewallvm_and_usbvm)
-            self._container.add(
-                w,
-                self._set_checkbox,
-                '_disp_firewallvm_and_usbvm')
+                title=_("Make sys-firewall and sys-usb disposable"),
+                completed=self._disp_firewallvm_and_usbvm,
+            )
+            self._container.add(w, self._set_checkbox, "_disp_firewallvm_and_usbvm")
             w = CheckboxWidget(
-                title=_('Make sys-net disposable'),
-                completed=self._disp_netvm)
-            self._container.add(w, self._set_checkbox, '_disp_netvm')
-        w = CheckboxWidget(title=_('Create default application qubes '
-                                   '(personal, work, untrusted, vault)'),
-                           completed=self._default_vms)
-        self._container.add(w, self._set_checkbox, '_default_vms')
+                title=_("Make sys-net disposable"), completed=self._disp_netvm
+            )
+            self._container.add(w, self._set_checkbox, "_disp_netvm")
+        w = CheckboxWidget(
+            title=_(
+                "Create default application qubes " "(personal, work, untrusted, vault)"
+            ),
+            completed=self._default_vms,
+        )
+        self._container.add(w, self._set_checkbox, "_default_vms")
         if self.qubes_data.whonix_available:
             w = CheckboxWidget(
-                title=_('Create Whonix Gateway and Workstation qubes '
-                        '(sys-whonix, anon-whonix)'),
-                completed=self._whonix_vms)
-            self._container.add(w, self._set_checkbox, '_whonix_vms')
+                title=_(
+                    "Create Whonix Gateway and Workstation qubes "
+                    "(sys-whonix, anon-whonix)"
+                ),
+                completed=self._whonix_vms,
+            )
+            self._container.add(w, self._set_checkbox, "_whonix_vms")
         if self._whonix_vms:
             w = CheckboxWidget(
-                title=_('Enable system and template updates over the Tor anonymity '
-                        'network using Whonix'),
-                completed=self._whonix_default)
-            self._container.add(w, self._set_checkbox, '_whonix_default')
+                title=_(
+                    "Enable system and template updates over the Tor anonymity "
+                    "network using Whonix"
+                ),
+                completed=self._whonix_default,
+            )
+            self._container.add(w, self._set_checkbox, "_whonix_default")
         if self.qubes_data.usbvm_available:
             w = CheckboxWidget(
-                title=_('Create USB qube holding all USB controllers (sys-usb)'),
-                completed=self._usbvm)
-            self._container.add(w, self._set_checkbox, '_usbvm')
+                title=_("Create USB qube holding all USB controllers (sys-usb)"),
+                completed=self._usbvm,
+            )
+            self._container.add(w, self._set_checkbox, "_usbvm")
         if self._usbvm:
             w = CheckboxWidget(
-                title=_('Use sys-net qube for both networking and USB devices'),
-                completed=self._usbvm_with_netvm)
-            self._container.add(w, self._set_checkbox, '_usbvm_with_netvm')
+                title=_("Use sys-net qube for both networking and USB devices"),
+                completed=self._usbvm_with_netvm,
+            )
+            self._container.add(w, self._set_checkbox, "_usbvm_with_netvm")
         if self._usbvm:
             w = CheckboxWidget(
-                title=_('Automatically accept USB mice (discouraged)'),
-                completed=self._allow_usb_mouse)
-            self._container.add(w, self._set_checkbox, '_allow_usb_mouse')
+                title=_("Automatically accept USB mice (discouraged)"),
+                completed=self._allow_usb_mouse,
+            )
+            self._container.add(w, self._set_checkbox, "_allow_usb_mouse")
 
         self.window.add_with_separator(self._container)
 
@@ -185,7 +197,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
         """
 
         for attr in self.qubes_data.bool_options:
-            setattr(self.qubes_data, attr, getattr(self, '_' + attr))
+            setattr(self.qubes_data, attr, getattr(self, "_" + attr))
 
         self.qubes_data.seen = True
 
