@@ -83,8 +83,9 @@ class DefaultKernelTask(BaseQubesTask):
 
 
 class DefaultPoolTask(BaseQubesTask):
-    def __init__(self, vg_tpool):
+    def __init__(self, create_default_tpool, vg_tpool):
         super().__init__()
+        self.create_default_tpool = create_default_tpool
         self.vg_tpool = vg_tpool
 
     @property
@@ -93,9 +94,22 @@ class DefaultPoolTask(BaseQubesTask):
 
     def run(self):
         # At this stage:
-        # 1) on default LVM install, '(qubes_dom0, vm-pool)' is available
+        # 1) on default LVM install, '(qubes_dom0, vm-pool)' is not available yet
         # 2) on non-default LVM install, we assume that user *should* have
         #    use custom thin pool to use
+        # 3) in all the cases, we propose to create '(qubes_dom0, vm-pool)'
+        if self.create_default_tpool:
+            self.run_command(
+                [
+                    "/usr/sbin/lvcreate",
+                    "-l",
+                    "90%FREE",
+                    "--thinpool",
+                    "vm-pool",
+                    "qubes_dom0",
+                ],
+            )
+            self.vg_tpool = ("qubes_dom0", "vm-pool")
         if self.vg_tpool:
             volume_group, thin_pool = self.vg_tpool
 
@@ -109,7 +123,7 @@ class DefaultPoolTask(BaseQubesTask):
             )
             cmd.wait()
             if cmd.returncode != 0:
-                # create only if doesn't exist already
+                # create only if it doesn't exist already
                 self.run_command(
                     [
                         "/usr/bin/qvm-pool",

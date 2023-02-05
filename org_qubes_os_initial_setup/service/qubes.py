@@ -69,13 +69,14 @@ class QubesInitialSetup(KickstartService):
         "vg_tpool",
         "templates_to_install",
         "default_template",
+        "lvm_setup",
+        "create_default_tpool",
     )
 
     def __init__(self):
         super().__init__()
         self.fedora_available = is_template_rpm_available("fedora")
         self.debian_available = is_template_rpm_available("debian")
-
         self.whonix_available = is_template_rpm_available(
             "whonix-gw"
         ) and is_template_rpm_available("whonix-ws")
@@ -119,8 +120,17 @@ class QubesInitialSetup(KickstartService):
         self._allow_usb_mouse = False
         self._allow_usb_keyboard = bool(self.usb_keyboards_detected)
 
-        self._vg_tpool = get_default_tpool()
-        self.custom_pool = False
+        self._lvm_setup = True
+        self._create_default_tpool = True
+
+        default_tpool = get_default_tpool()
+        if default_tpool:
+            self._vg_tpool = default_tpool
+        else:
+            self._vg_tpool = ("", "")
+            self._lvm_setup = False
+
+        self._custom_pool = False
 
         self._skip = False
 
@@ -215,7 +225,11 @@ class QubesInitialSetup(KickstartService):
 
         tasks = []
         tasks.append(DefaultKernelTask())
-        tasks.append(DefaultPoolTask(vg_tpool=self.vg_tpool))
+        tasks.append(
+            DefaultPoolTask(
+                create_default_tpool=self.create_default_tpool, vg_tpool=self.vg_tpool
+            )
+        )
         for template in self.templates_to_install:
             tasks.append(InstallTemplateTask(template=template))
         tasks.append(CleanTemplatePkgsTask())

@@ -162,6 +162,14 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
         self.implementation.allow_usb_keyboard = value
 
     @property
+    def CreateDefaultTpool(self) -> Bool:
+        return self.implementation.create_default_tpool
+
+    @CreateDefaultTpool.setter
+    def CreateDefaultTpool(self, value: Bool):
+        self.implementation.create_default_tpool = value
+
+    @property
     def VgTpool(self) -> Tuple[str, str]:
         return self.implementation.vg_tpool
 
@@ -186,6 +194,10 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
         self.implementation.default_template = value
 
     # read-only properties
+    @property
+    def LvmSetup(self) -> bool:
+        return self.implementation.lvm_setup
+
     @property
     def FedoraAvailable(self) -> bool:
         return self.implementation.fedora_available

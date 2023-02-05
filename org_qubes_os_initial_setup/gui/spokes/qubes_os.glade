@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.0"/>
   <requires lib="AnacondaWidgets" version="1.0"/>
   <object class="AnacondaSpokeWindow" id="qubesOsSpokeWindow">
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <property name="hexpand">True</property>
     <property name="vexpand">True</property>
-    <property name="window_name" translatable="yes">QUBES OS</property>
+    <property name="window-name" translatable="yes">QUBES OS</property>
     <signal name="button-clicked" handler="on_back_clicked" swapped="no"/>
     <child internal-child="main_box">
       <object class="GtkBox" id="AnacondaSpokeWindow-main_box1">
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child internal-child="nav_box">
           <object class="GtkEventBox" id="AnacondaSpokeWindow-nav_box1">
-            <property name="app_paintable">True</property>
-            <property name="can_focus">False</property>
+            <property name="app-paintable">True</property>
+            <property name="can-focus">False</property>
             <child internal-child="nav_area">
+              <!-- n-columns=3 n-rows=3 -->
               <object class="GtkGrid" id="AnacondaSpokeWindow-nav_area1">
-                <property name="can_focus">False</property>
-                <property name="margin_left">6</property>
-                <property name="margin_right">6</property>
-                <property name="margin_top">6</property>
+                <property name="can-focus">False</property>
+                <property name="margin-left">6</property>
+                <property name="margin-right">6</property>
+                <property name="margin-top">6</property>
               </object>
             </child>
           </object>
@@ -35,31 +36,31 @@
         </child>
         <child internal-child="alignment">
           <object class="GtkAlignment" id="AnacondaSpokeWindow-alignment1">
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="yalign">0</property>
             <property name="xscale">0</property>
             <property name="yscale">0.5</property>
             <child internal-child="action_area">
               <object class="GtkBox" id="AnacondaSpokeWindow-action_area1">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkBox">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">20</property>
                     <child>
                       <object class="GtkBox" id="templatesBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkLabel" id="label2">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="margin_bottom">10</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-bottom">10</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">Templates Configuration</property>
                             <property name="xalign">0</property>
@@ -77,10 +78,10 @@
                         <child>
                           <object class="GtkLabel">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="can-focus">False</property>
                             <property name="halign">start</property>
-                            <property name="margin_top">2</property>
-                            <property name="margin_bottom">2</property>
+                            <property name="margin-top">2</property>
+                            <property name="margin-bottom">2</property>
                             <property name="label" translatable="yes">Installation:</property>
                           </object>
                           <packing>
@@ -111,42 +112,7 @@
                           <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkBox" id="templateDefaultBox">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="homogeneous">True</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="margin_top">2</property>
-                                <property name="margin_bottom">2</property>
-                                <property name="label" translatable="yes">Default:</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBoxText" id="templateComboBox">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">9</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                       </object>
                       <packing>
@@ -158,13 +124,13 @@
                     <child>
                       <object class="GtkBox" id="mainBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkLabel" id="label1">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="margin_bottom">10</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-bottom">10</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">Main Configuration</property>
                             <property name="xalign">0</property>
@@ -216,13 +182,13 @@
                     <child>
                       <object class="GtkBox" id="advancedBox">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
                           <object class="GtkLabel" id="label3">
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="margin_bottom">10</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-bottom">10</property>
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">Advanced Configuration</property>
                             <property name="xalign">0</property>
@@ -241,66 +207,7 @@
                           <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkGrid" id="poolGrid">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="margin_top">2</property>
-                            <property name="margin_bottom">2</property>
-                            <property name="row_spacing">2</property>
-                            <property name="row_homogeneous">True</property>
-                            <property name="column_homogeneous">True</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="margin_right">6</property>
-                                <property name="label" translatable="yes">LVM Volume Group:</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">0</property>
-                                <property name="top_attach">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="margin_right">6</property>
-                                <property name="label" translatable="yes">LVM Thin Pool:</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">0</property>
-                                <property name="top_attach">1</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBoxText" id="vgComboBox">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkComboBoxText" id="tpComboBox">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left_attach">1</property>
-                                <property name="top_attach">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">2</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <child>
                           <placeholder/>

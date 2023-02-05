@@ -45,6 +45,7 @@ class QubesData(AddonData):
         "skip",
         "allow_usb_mouse",
         "allow_usb_keyboard",
+        "create_default_tpool",
     )
 
     def __init__(self):
@@ -65,7 +66,6 @@ class QubesData(AddonData):
         self.allow_usb_mouse = False
         self.allow_usb_keyboard = None
 
-        self.custom_pool = False
         self.vg_tpool = None
 
         self.skip = False
