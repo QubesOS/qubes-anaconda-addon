@@ -313,11 +313,12 @@ class CreateDefaultDVMTask(BaseQubesTask):
 
 
 class ConfigureNetworkTask(BaseQubesTask):
-    def __init__(self, whonix_default, start_usb):
+    def __init__(self, whonix_default, start_usb, start_whonix):
         super().__init__()
         self.whonix_default = whonix_default
         # should sys-usb be started too?
         self.start_usb = start_usb
+        self.start_whonix = start_whonix
 
     @property
     def name(self):
@@ -337,3 +338,6 @@ class ConfigureNetworkTask(BaseQubesTask):
         if self.start_usb:
             # Workaround for #1464 (so qvm.start from salt can't be used)
             self.run_command(["systemctl", "start", "qubes-vm@sys-usb.service"])
+        if self.start_whonix:
+            # Workaround for #1464 (so qvm.start from salt can't be used)
+            self.run_command(["systemctl", "start", "qubes-vm@sys-whonix.service"])

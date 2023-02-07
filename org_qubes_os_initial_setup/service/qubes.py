@@ -256,7 +256,9 @@ class QubesInitialSetup(KickstartService):
             tasks.append(CreateDefaultDVMTask(default_template=default_template))
         tasks.append(
             ConfigureNetworkTask(
-                whonix_default=self.whonix_default, start_usb=start_usb
+                whonix_default=self.whonix_default,
+                start_usb=start_usb,
+                start_whonix=self.whonix_vms,
             )
         )
         return tasks
