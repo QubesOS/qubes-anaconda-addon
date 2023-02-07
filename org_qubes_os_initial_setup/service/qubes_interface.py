@@ -221,7 +221,3 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
     @property
     def UsbKeyboardsDetected(self) -> List[str]:
         return self.implementation.usb_keyboards_detected
-
-    @property
-    def CustomPool(self) -> bool:
-        return self.implementation.custom_pool

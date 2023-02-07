@@ -121,6 +121,7 @@ def get_default_tpool():
     if target_type not in ("thin", "linear"):
         return None
 
+    create = False
     lower_devnum, _args = target_args.split(" ")
     with open("/sys/dev/block/{}/dm/name".format(lower_devnum), "r") as lower_devname_f:
         lower_devname = lower_devname_f.read().rstrip("\n")
@@ -138,6 +139,7 @@ def get_default_tpool():
         thin_pool = None
 
     if thin_pool in (None, "root-pool"):
+        thin_pool = "vm-pool"
         # search for "vm-pool" in the same VG
         try:
             cmd = ["lvs", "--noheadings", "{}/vm-pool".format(volume_group)]
@@ -145,12 +147,10 @@ def get_default_tpool():
                 cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
             )
         except subprocess.CalledProcessError:
-            return None
-        else:
-            thin_pool = "vm-pool"
+            create = True
 
     if volume_group and thin_pool:
-        return volume_group, thin_pool
+        return volume_group, thin_pool, create
 
     return None
 

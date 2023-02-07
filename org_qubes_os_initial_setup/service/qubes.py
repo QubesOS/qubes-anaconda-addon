@@ -125,12 +125,12 @@ class QubesInitialSetup(KickstartService):
 
         default_tpool = get_default_tpool()
         if default_tpool:
-            self._vg_tpool = default_tpool
+            vg, tpool, create = default_tpool
+            self._vg_tpool = vg, tpool
+            self._create_default_tpool = create
         else:
             self._vg_tpool = ("", "")
             self._lvm_setup = False
-
-        self._custom_pool = False
 
         self._skip = False
 
@@ -225,11 +225,13 @@ class QubesInitialSetup(KickstartService):
 
         tasks = []
         tasks.append(DefaultKernelTask())
-        tasks.append(
-            DefaultPoolTask(
-                create_default_tpool=self.create_default_tpool, vg_tpool=self.vg_tpool
+        if self.lvm_setup:
+            tasks.append(
+                DefaultPoolTask(
+                    create_default_tpool=self.create_default_tpool,
+                    vg_tpool=self.vg_tpool
+                )
             )
-        )
         for template in self.templates_to_install:
             tasks.append(InstallTemplateTask(template=template))
         tasks.append(CleanTemplatePkgsTask())

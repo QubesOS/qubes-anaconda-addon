@@ -277,7 +277,7 @@ class QubesInitThinPoolChoice(QubesChoiceBase):
         self.widget.pack_start(self.create_pool_choice.widget, True, True, 0)
 
         self.custom_pool_choice = QubesRadioChoice(
-            label=_("Use custom storage pool"),
+            label=_("Use existing LVM thin pool"),
             group=self.create_pool_choice.widget,
             location=None,
         )
