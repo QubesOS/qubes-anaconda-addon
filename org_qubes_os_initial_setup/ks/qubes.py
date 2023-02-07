@@ -353,6 +353,9 @@ class QubesData(AddonData):
         if self.usbvm and not self.usbvm_with_netvm:
             # Workaround for #1464 (so qvm.start from salt can't be used)
             self.run_command(['systemctl', 'start', 'qubes-vm@sys-usb.service'])
+        if self.whonix_vms:
+            # Workaround for #1464 (so qvm.start from salt can't be used)
+            self.run_command(["systemctl", "start", "qubes-vm@sys-whonix.service"])
 
         try:
             self.configure_default_dvm()
