@@ -181,7 +181,7 @@ class QubesInitialSetup(KickstartService):
                 setattr(self, attr, getattr(ks_data, attr))
         if ks_data.vg_tpool is not None:
             self.vg_tpool = ks_data.vg_tpool
-            self.custom_pool = True
+            self.create_default_tpool = False
         if ks_data.templates_to_install is not None:
             self.templates_to_install = ks_data.templates_to_install
         if ks_data.default_template is not None:
@@ -195,7 +195,7 @@ class QubesInitialSetup(KickstartService):
         # the need to copy this is stupid...
         for attr in ks_data.bool_options + ("templates_to_install", "default_template"):
             setattr(ks_data, attr, getattr(self, attr))
-        if self.custom_pool:
+        if not self.create_default_tpool:
             ks_data.vg_tpool = self.vg_tpool
 
     def install_with_tasks(self):
