@@ -516,7 +516,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             self.choice_usb = QubesDisabledButtonChoice(
                 location=self.mainBox,
                 label=_(
-                    "USB qube configuration disabled - you are using USB keyboard or USB disk"
+                    "USB qube configuration disabled - you are using USB disk"
                 ),
             )
 
