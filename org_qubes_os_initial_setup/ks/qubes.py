@@ -63,6 +63,15 @@ def is_package_installed(pkgname):
     return bool(pkglist)
 
 
+def is_usb_device(device: pyudev.Device):
+    if device.get("ID_USB_INTERFACES", False):
+        return True
+    for parent in device.ancestors:
+        if parent.get("ID_USB_INTERFACES", False):
+            return True
+    return False
+
+
 def usb_keyboard_present():
     context = pyudev.Context()
     keyboards = context.list_devices(subsystem='input', ID_INPUT_KEYBOARD='1')
@@ -75,7 +84,7 @@ def usb_keyboard_present():
                 dom0_controllers.extend(opt.split('=', 1)[1].split(','))
     usb_keyboards = []
     for kbd in keyboards:
-        if not kbd.get('ID_USB_INTERFACES', False):
+        if not is_usb_device(kbd):
             continue
         for dom0_usb in dom0_controllers:
             if kbd.get('ID_PATH', '').startswith('pci-0000:' + dom0_usb + '-'):
@@ -107,7 +116,7 @@ def started_from_usb():
             continue
         for dev in get_all_used_devices(device):
             udev_info = pyudev.Device.from_device_file(context, dev)
-            if udev_info.get('ID_USB_INTERFACES', False):
+            if is_usb_device(udev_info):
                 return True
 
     return False
