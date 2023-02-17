@@ -115,7 +115,7 @@ def started_from_usb():
         if not os.path.exists(device):
             continue
         for dev in get_all_used_devices(device):
-            udev_info = pyudev.Device.from_device_file(context, dev)
+            udev_info = pyudev.Devices.from_device_file(context, dev)
             if is_usb_device(udev_info):
                 return True
 
