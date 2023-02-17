@@ -105,6 +105,7 @@ class QubesChoice(QubesChoiceBase):
                                               self.friend_on_toggled)
                 if isinstance(dependency.widget, Gtk.ComboBox):
                     dependency.widget.connect('changed', self.friend_on_toggled)
+                self.friend_on_toggled(dependency.widget)
 
         choices_instances.append(self)
 
@@ -184,6 +185,7 @@ class QubesChoiceTemplate(QubesChoiceBase):
                 dependency.widget.connect('toggled', self.friend_on_toggled)
                 dependency.widget.connect('notify::sensitive',
                                           self.friend_on_toggled)
+                self.friend_on_toggled(dependency.widget)
 
         # choices_instances.append(self)
 
