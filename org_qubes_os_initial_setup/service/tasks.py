@@ -308,7 +308,7 @@ class CreateDefaultDVMTask(BaseQubesTask):
 
     def run(self):
         if self.default_template:
-            dispvm_name = self.default_template + "-dvm"
+            dispvm_name = "default-dvm"
             self.run_command(["/usr/bin/qubes-prefs", "default-dispvm", dispvm_name])
 
 
