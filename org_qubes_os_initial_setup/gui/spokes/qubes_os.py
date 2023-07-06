@@ -668,8 +668,8 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         self.choice_install_whonix.set_selected(
             self.qubes_data.whonix_available
-            and "whonix-gw" in self.qubes_data.templates_to_install
-            and "whonix-ws" in self.qubes_data.templates_to_install
+            and "whonix-gateway" in self.qubes_data.templates_to_install
+            and "whonix-workstation" in self.qubes_data.templates_to_install
         )
 
         self.choice_system.set_selected(self.qubes_data.system_vms)
@@ -729,7 +729,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         if self.choice_install_debian.get_selected():
             templates_to_install.append("debian")
         if self.choice_install_whonix.get_selected():
-            templates_to_install += ["whonix-gw", "whonix-ws"]
+            templates_to_install += ["whonix-gateway", "whonix-workstation"]
 
         self.qubes_data.templates_to_install = templates_to_install
         for key, val in self.qubes_data.templates_aliases.items():

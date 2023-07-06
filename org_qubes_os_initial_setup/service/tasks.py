@@ -150,10 +150,7 @@ class InstallTemplateTask(BaseQubesTask):
 
     def run(self):
         template = self.template
-        if template.startswith("whonix"):
-            template_version = get_template_version("whonix-ws")
-        else:
-            template_version = get_template_version(template)
+        template_version = get_template_version(template)
         template_name = "%s-%s" % (template, template_version)
         self.report_progress("Installing TemplateVM %s" % template_name)
         rpm = get_template_rpm(template)

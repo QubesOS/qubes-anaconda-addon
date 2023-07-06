@@ -77,9 +77,9 @@ class QubesInitialSetup(KickstartService):
         super().__init__()
         self.fedora_available = is_template_rpm_available("fedora")
         self.debian_available = is_template_rpm_available("debian")
-        self.whonix_available = is_template_rpm_available(
-            "whonix-gw"
-        ) and is_template_rpm_available("whonix-ws")
+        self.whonix_available = (
+                is_template_rpm_available("whonix-gateway") and
+                is_template_rpm_available("whonix-workstation"))
 
         self.templates_aliases = {}
         self.templates_versions = {}
@@ -96,7 +96,9 @@ class QubesInitialSetup(KickstartService):
             )
 
         if self.whonix_available:
-            self.templates_versions["whonix"] = get_template_version("whonix-ws")
+            self.templates_versions["whonix"] = (
+                get_template_version("whonix-workstation")
+            )
             self.templates_aliases["whonix"] = (
                 "Whonix %s" % self.templates_versions["whonix"]
             )
@@ -135,7 +137,7 @@ class QubesInitialSetup(KickstartService):
         self._skip = False
 
         self._default_template = None
-        self._templates_to_install = ["fedora", "debian", "whonix-gw", "whonix-ws"]
+        self._templates_to_install = ["fedora", "debian", "whonix-gateway", "whonix-workstation"]
 
         self.qubes_user = None
 
