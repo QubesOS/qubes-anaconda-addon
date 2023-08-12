@@ -67,6 +67,7 @@ class QubesData(AddonData):
         self.allow_usb_keyboard = None
 
         self.vg_tpool = None
+        self.create_default_tpool = True
 
         self.skip = False
 
