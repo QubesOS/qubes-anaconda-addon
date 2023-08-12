@@ -16,11 +16,11 @@
 #
 # You should have received a copy of the GNU General Public
 # License along with this library; if not, see <https://www.gnu.org/licenses/>.
-import distutils.version
 import logging
 import os
 import shutil
 import subprocess
+from looseversion import LooseVersion
 
 from pyanaconda.core import util
 from pyanaconda.core.configuration.anaconda import conf
@@ -74,9 +74,7 @@ class DefaultKernelTask(BaseQubesTask):
     def run(self):
         installed_kernels = os.listdir("/var/lib/qubes/vm-kernels")
         installed_kernels = [
-            distutils.version.LooseVersion(x)
-            for x in installed_kernels
-            if x[0].isdigit()
+            LooseVersion(x) for x in installed_kernels if x[0].isdigit()
         ]
         default_kernel = str(sorted(installed_kernels)[-1])
         self.run_command(["/usr/bin/qubes-prefs", "default-kernel", default_kernel])
