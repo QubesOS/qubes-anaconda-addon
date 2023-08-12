@@ -24,13 +24,70 @@ import pyudev
 
 from org_qubes_os_initial_setup.constants import TEMPLATES_RPM_PATH
 
+# dict[str, tuple(version, filename, alias, full-name)]
+templates_cache = {}
+
+
+def _template_alias_parts(template):
+    # yield parts that are to be included in the final alias (to be joined
+    # with a space)
+    version_found = False
+    for part in template.capitalize().split("-"):
+        if part[0].isdigit():
+            if version_found:
+                # only first numer is considered a template version
+                continue
+            version_found = True
+        # adjust cases for flavors
+        if part == "xfce":
+            part = "Xfce"
+        elif part == "kde":
+            part = "KDE"
+        elif part == "gnome":
+            part = "GNOME"
+        yield part
+
+
+def update_template_list():
+    global templates_cache
+    templates = {}
+    try:
+        for fname in os.listdir(TEMPLATES_RPM_PATH):
+            if not fname.startswith("qubes-template-"):
+                continue
+            if not fname.endswith(".rpm"):
+                continue
+            tname = fname[len("qubes-template-") :]
+            # then remove .noarch.rpm (also when different arch is set)
+            tname = tname.rsplit(".", 2)[0]
+            # then remove package version (-4.2.0-202301020304
+            tname = tname.rsplit("-", 2)[0]
+            parts = tname.split("-")
+            # now drop numeric parts
+            name_flavor = "-".join(p for p in parts if p[0].isalpha())
+            version = [p for p in parts if p[0].isdigit()][0]
+            alias = " ".join(_template_alias_parts(tname))
+            templates[name_flavor] = (version, fname, alias, tname)
+    except FileNotFoundError:
+        # don't crash if no templates are available at all
+        pass
+    templates_cache = templates
+
+
+def get_template_alias(template):
+    if not templates_cache:
+        update_template_list()
+    if template in templates_cache:
+        return templates_cache[template][2]
+    return None
+
 
 def get_template_rpm(template):
-    try:
-        rpm = glob.glob(TEMPLATES_RPM_PATH + "qubes-template-%s-*.rpm" % template)[0]
-    except IndexError:
-        rpm = None
-    return rpm
+    if not templates_cache:
+        update_template_list()
+    if template in templates_cache:
+        return TEMPLATES_RPM_PATH + templates_cache[template][1]
+    return None
 
 
 def is_template_rpm_available(template):
@@ -38,11 +95,24 @@ def is_template_rpm_available(template):
 
 
 def get_template_version(template):
-    rpm = get_template_rpm(template)
-    if rpm:
-        rpm = os.path.basename(rpm)
-        version = rpm.replace("qubes-template-%s-" % template, "").split("-")[0]
-        return version
+    if not templates_cache:
+        update_template_list()
+    if template in templates_cache:
+        return templates_cache[template][0]
+    return None
+
+
+def get_template_name(template):
+    if not templates_cache:
+        update_template_list()
+    if template in templates_cache:
+        return templates_cache[template][3]
+    return None
+
+
+def get_templates_list():
+    """Returns list of (name, alias) about available templates"""
+    return [(name, info[2]) for name, info in templates_cache.items()]
 
 
 def is_package_installed(pkgname):

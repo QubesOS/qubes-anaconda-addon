@@ -119,6 +119,12 @@ class QubesButtonChoice(QubesChoiceBase):
         self.widget.connect("notify::sensitive", *args)
 
 
+class QubesInstallTemplateChoice(QubesButtonChoice):
+    def __init__(self, location, label, template, dependencies=None, indent=False):
+        super().__init__(location, label, dependencies, indent)
+        self.template = template
+
+
 #
 # Gtk.Box -> Gtk.Label
 #
@@ -429,28 +435,15 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
     def init_qubes_choices(self):
         default_templates = []
-        if self.qubes_data.fedora_available:
-            default_templates.append(self.qubes_data.templates_aliases["fedora"])
-            self.choice_install_fedora = QubesButtonChoice(
+        self.template_choices = {}
+        for template, alias in sorted(self.qubes_data.templates_aliases.items()):
+            if template.startswith("whonix"):
+                continue
+            default_templates.append(alias)
+            self.template_choices[template] = QubesInstallTemplateChoice(
                 location=self.templatesBox,
-                label=_(self.qubes_data.templates_aliases["fedora"]),
-            )
-        else:
-            self.choice_install_fedora = QubesDisabledButtonChoice(
-                location=self.templatesBox,
-                label=_("Fedora not available"),
-            )
-
-        if self.qubes_data.debian_available:
-            default_templates.append(self.qubes_data.templates_aliases["debian"])
-            self.choice_install_debian = QubesButtonChoice(
-                location=self.templatesBox,
-                label=_(self.qubes_data.templates_aliases["debian"]),
-            )
-        else:
-            self.choice_install_debian = QubesDisabledButtonChoice(
-                location=self.templatesBox,
-                label=_("Debian not available"),
+                label=_(alias),
+                template=template,
             )
 
         if self.qubes_data.whonix_available:
@@ -468,10 +461,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.choice_default_template = QubesTemplateChoice(
             location=self.templatesBox,
             entries=default_templates,
-            dependencies=[
-                self.choice_install_fedora,
-                self.choice_install_debian,
-            ],
+            dependencies=list(self.template_choices.values()),
         )
 
         self.choice_system = QubesButtonChoice(
@@ -515,9 +505,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         else:
             self.choice_usb = QubesDisabledButtonChoice(
                 location=self.mainBox,
-                label=_(
-                    "USB qube configuration disabled - you are using USB disk"
-                ),
+                label=_("USB qube configuration disabled - you are using USB disk"),
             )
 
         self.choice_usb_with_netvm = QubesButtonChoice(
@@ -607,10 +595,8 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.advancedBox.pack_start(self.check_advanced.widget, False, True, 0)
 
         # Default choices
-        if self.choice_install_fedora.widget.get_sensitive():
-            self.choice_install_fedora.widget.set_active(True)
-        if self.choice_install_debian.widget.get_sensitive():
-            self.choice_install_debian.widget.set_active(True)
+        for choice in self.template_choices.values():
+            choice.widget.set_active(True)
         if self.choice_install_whonix.widget.get_sensitive():
             self.choice_install_whonix.widget.set_active(True)
 
@@ -656,21 +642,21 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         """
 
-        self.choice_install_fedora.set_selected(
-            self.qubes_data.fedora_available
-            and "fedora" in self.qubes_data.templates_to_install
-        )
-
-        self.choice_install_debian.set_selected(
-            self.qubes_data.debian_available
-            and "debian" in self.qubes_data.templates_to_install
-        )
+        for template_choice in self.template_choices.values():
+            template_choice.set_selected(
+                template_choice.template in self.qubes_data.templates_to_install
+            )
 
         self.choice_install_whonix.set_selected(
             self.qubes_data.whonix_available
             and "whonix-gateway" in self.qubes_data.templates_to_install
             and "whonix-workstation" in self.qubes_data.templates_to_install
         )
+
+        for key, val in self.qubes_data.templates_aliases.items():
+            if key == self.qubes_data.default_template:
+                self.choice_default_template.set_entry(val)
+                break
 
         self.choice_system.set_selected(self.qubes_data.system_vms)
 
@@ -724,10 +710,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.qubes_data.skip = self.check_advanced.get_selected()
 
         templates_to_install = []
-        if self.choice_install_fedora.get_selected():
-            templates_to_install.append("fedora")
-        if self.choice_install_debian.get_selected():
-            templates_to_install.append("debian")
+        for template_choice in self.template_choices.values():
+            if template_choice.get_selected():
+                templates_to_install.append(template_choice.template)
         if self.choice_install_whonix.get_selected():
             templates_to_install += ["whonix-gateway", "whonix-workstation"]
 

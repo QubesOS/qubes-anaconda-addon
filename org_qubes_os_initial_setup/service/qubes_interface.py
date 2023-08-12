@@ -199,14 +199,6 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
         return self.implementation.lvm_setup
 
     @property
-    def FedoraAvailable(self) -> bool:
-        return self.implementation.fedora_available
-
-    @property
-    def DebianAvailable(self) -> bool:
-        return self.implementation.debian_available
-
-    @property
     def WhonixAvailable(self) -> bool:
         return self.implementation.whonix_available
 

@@ -71,7 +71,7 @@ class QubesData(AddonData):
         self.skip = False
 
         self.default_template = None
-        self.templates_to_install = ["fedora", "debian", "whonix-gateway", "whonix-workstation"]
+        self.templates_to_install = None
 
         self.qubes_user = None
 

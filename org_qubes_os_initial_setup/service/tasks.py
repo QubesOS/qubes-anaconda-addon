@@ -27,7 +27,7 @@ from pyanaconda.core.configuration.anaconda import conf
 from pyanaconda.modules.common.task import Task
 
 from org_qubes_os_initial_setup.constants import TEMPLATES_RPM_PATH
-from org_qubes_os_initial_setup.utils import get_template_version, get_template_rpm
+from org_qubes_os_initial_setup.utils import get_template_name, get_template_rpm
 
 log = logging.getLogger(__name__)
 
@@ -150,8 +150,7 @@ class InstallTemplateTask(BaseQubesTask):
 
     def run(self):
         template = self.template
-        template_version = get_template_version(template)
-        template_name = "%s-%s" % (template, template_version)
+        template_name = get_template_name(template)
         self.report_progress("Installing TemplateVM %s" % template_name)
         rpm = get_template_rpm(template)
         self.run_command(["/usr/bin/qvm-template", "install", "--nogpgcheck", rpm])

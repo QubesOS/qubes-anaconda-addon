@@ -48,6 +48,8 @@ from org_qubes_os_initial_setup.utils import (
     started_from_usb,
     usb_keyboard_present,
     get_default_tpool,
+    get_templates_list,
+    get_template_name,
 )
 
 log = logging.getLogger(__name__)
@@ -75,33 +77,20 @@ class QubesInitialSetup(KickstartService):
 
     def __init__(self):
         super().__init__()
-        self.fedora_available = is_template_rpm_available("fedora")
-        self.debian_available = is_template_rpm_available("debian")
-        self.whonix_available = (
-                is_template_rpm_available("whonix-gateway") and
-                is_template_rpm_available("whonix-workstation"))
+        self.whonix_available = is_template_rpm_available(
+            "whonix-gateway"
+        ) and is_template_rpm_available("whonix-workstation")
 
         self.templates_aliases = {}
-        self.templates_versions = {}
-        if self.fedora_available:
-            self.templates_versions["fedora"] = get_template_version("fedora")
-            self.templates_aliases["fedora"] = (
-                "Fedora %s" % self.templates_versions["fedora"]
-            )
-
-        if self.debian_available:
-            self.templates_versions["debian"] = get_template_version("debian")
-            self.templates_aliases["debian"] = (
-                "Debian %s" % self.templates_versions["debian"]
-            )
+        for template, alias in get_templates_list():
+            if template.startswith("whonix"):
+                # Handled specially below
+                continue
+            self.templates_aliases[template] = alias
 
         if self.whonix_available:
-            self.templates_versions["whonix"] = (
-                get_template_version("whonix-workstation")
-            )
-            self.templates_aliases["whonix"] = (
-                "Whonix %s" % self.templates_versions["whonix"]
-            )
+            version = get_template_version("whonix-workstation")
+            self.templates_aliases["whonix"] = "Whonix %s" % version
 
         self.usbvm_available = not started_from_usb()
         self.usb_keyboards_detected = usb_keyboard_present()
@@ -136,8 +125,15 @@ class QubesInitialSetup(KickstartService):
 
         self._skip = False
 
-        self._default_template = None
-        self._templates_to_install = ["fedora", "debian", "whonix-gateway", "whonix-workstation"]
+        self._templates_to_install = [name for name, version in get_templates_list()]
+        # prefer Fedora as default
+        if self._templates_to_install:
+            self._default_template = sorted(
+                self._templates_to_install,
+                key=(lambda name: ("0000-" + name) if "fedora" in name else name),
+            )[0]
+        else:
+            self._default_template = None
 
         self.qubes_user = None
 
@@ -213,15 +209,9 @@ class QubesInitialSetup(KickstartService):
         if self.default_template and not any(
             x.isdigit() for x in self.default_template
         ):
-            template_version = get_template_version(self.default_template)
-            if template_version is not None:
-                default_template = "%s-%s" % (
-                    self.default_template,
-                    get_template_version(self.default_template),
-                )
-            else:
+            default_template = get_template_name(self.default_template)
+            if default_template is None:
                 log.warning("Template '%s' not found", self.default_template)
-                default_template = None
         else:
             default_template = self.default_template
 
@@ -231,7 +221,7 @@ class QubesInitialSetup(KickstartService):
             tasks.append(
                 DefaultPoolTask(
                     create_default_tpool=self.create_default_tpool,
-                    vg_tpool=self.vg_tpool
+                    vg_tpool=self.vg_tpool,
                 )
             )
         for template in self.templates_to_install:
