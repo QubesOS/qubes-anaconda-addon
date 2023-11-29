@@ -95,19 +95,23 @@ class DefaultPoolTask(BaseQubesTask):
         # 1) on default LVM install, '(qubes_dom0, vm-pool)' is not available yet
         # 2) on non-default LVM install, we assume that user *should* have
         #    use custom thin pool to use
-        # 3) in all the cases, we propose to create '(qubes_dom0, vm-pool)'
+        # 3) in all the cases, we propose to create 'vm-pool' in appropriate
+        #    volume group
         if self.create_default_tpool:
+            # should be pre-filled based on rootfs's volume group
+            # see utils.get_default_tpool() called from QubesInitialSetup()
+            if self.vg_tpool is None:
+                raise Exception("Cannot find default LVM volume group")
             self.run_command(
                 [
                     "/usr/sbin/lvcreate",
                     "-l",
                     "90%FREE",
                     "--thinpool",
-                    "vm-pool",
-                    "qubes_dom0",
+                    self.vg_tpool[1],
+                    self.vg_tpool[0],
                 ],
             )
-            self.vg_tpool = ("qubes_dom0", "vm-pool")
         if self.vg_tpool:
             volume_group, thin_pool = self.vg_tpool
 
