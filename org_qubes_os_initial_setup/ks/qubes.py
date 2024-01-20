@@ -146,7 +146,9 @@ class QubesData(AddonData):
 
         self.whonix_available = (
                 is_template_rpm_available('whonix-gw') and
-                is_template_rpm_available('whonix-ws'))
+                is_template_rpm_available('whonix-ws')) or (
+                is_template_rpm_available('whonix-gateway') and
+                is_template_rpm_available('whonix-workstation'))
 
         self.templates_aliases = {}
         self.templates_versions = {}
@@ -159,7 +161,7 @@ class QubesData(AddonData):
             self.templates_aliases['debian'] = 'Debian %s' % self.templates_versions['debian']
 
         if self.whonix_available:
-            self.templates_versions['whonix'] = get_template_version('whonix-ws')
+            self.templates_versions['whonix'] = get_template_version('whonix-ws') or get_template_version('whonix-workstation')
             self.templates_aliases['whonix'] = 'Whonix %s' % self.templates_versions['whonix']
 
         self.usbvm_available = not started_from_usb()
@@ -185,8 +187,11 @@ class QubesData(AddonData):
         self.skip = False
 
         self.default_template = None
+        self.whonix_templates = ['whonix-gateway', 'whonix-workstation']
+        if is_template_rpm_available('whonix-gw'):
+            self.whonix_templates = ['whonix-gw', 'whonix-ws']
         self.templates_to_install = \
-            ['fedora', 'debian', 'whonix-gw', 'whonix-ws']
+            ['fedora', 'debian'] + self.whonix_templates
 
         # this is a hack, but initial-setup do not have progress hub or similar
         # provision for handling lengthy self.execute() call, so we must do it
