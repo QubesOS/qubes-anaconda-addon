@@ -50,6 +50,7 @@ from org_qubes_os_initial_setup.utils import (
     get_default_tpool,
     get_templates_list,
     get_template_name,
+    is_disp_preload_available,
 )
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ class QubesInitialSetup(KickstartService):
         "system_vms",
         "disp_firewallvm_and_usbvm",
         "disp_netvm",
+        "disp_preload",
         "default_vms",
         "whonix_vms",
         "whonix_default",
@@ -80,6 +82,7 @@ class QubesInitialSetup(KickstartService):
         self.whonix_available = is_template_rpm_available(
             "whonix-gateway"
         ) and is_template_rpm_available("whonix-workstation")
+        self.disp_preload_available = is_disp_preload_available()
 
         self.templates_aliases = {}
         for template, alias in get_templates_list():
@@ -99,6 +102,7 @@ class QubesInitialSetup(KickstartService):
 
         self._disp_firewallvm_and_usbvm = True
         self._disp_netvm = False
+        self._disp_preload = self.disp_preload_available
 
         self._default_vms = True
 
@@ -242,6 +246,7 @@ class QubesInitialSetup(KickstartService):
                 whonix_vms=self.whonix_vms,
                 default_vms=self.default_vms,
                 disp_netvm=self.disp_netvm,
+                disp_preload=self.disp_preload,
             )
         )
         if default_template:

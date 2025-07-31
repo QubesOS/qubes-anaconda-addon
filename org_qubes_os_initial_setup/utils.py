@@ -182,6 +182,16 @@ def started_from_usb():
     return False
 
 
+def is_disp_preload_available() -> bool:
+    try:
+        total_memory = subprocess.check_output(["xl", "info", "total_memory"])
+        total_memory_megabytes = int(total_memory.decode("ascii"))
+    except subprocess.CalledProcessError:
+        return False
+    total_memory_gigabytes = int(total_memory_megabytes / 1000)
+    return bool(total_memory_gigabytes >= 16)
+
+
 def get_default_tpool():
     # get VG / pool where root filesystem lives
     fs_stat = os.stat("/")

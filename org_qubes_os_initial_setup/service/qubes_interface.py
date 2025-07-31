@@ -52,6 +52,7 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
     #             ("system_vms", "Bool"),
     #             ("disp_firewallvm_and_usbvm", "Bool"),
     #             ("disp_netvm", "Bool"),
+    #             ("disp_preload", "Bool"),
     #             ("default_vms", "Bool"),
     #             ("whonix_vms", "Bool"),
     #             ("whonix_default", "Bool"),
@@ -96,6 +97,18 @@ class QubesInitialSetupInterface(KickstartModuleInterface):
     @DispNetvm.setter
     def DispNetvm(self, value: Bool):
         self.implementation.disp_netvm = value
+
+    @property
+    def DispPreloadAvailable(self) -> Bool:
+        return self.implementation.disp_preload_available
+
+    @property
+    def DispPreload(self) -> Bool:
+        return self.implementation.disp_preload
+
+    @DispPreload.setter
+    def DispPreload(self, value: Bool):
+        self.implementation.disp_preload = value
 
     @property
     def DefaultVms(self) -> Bool:

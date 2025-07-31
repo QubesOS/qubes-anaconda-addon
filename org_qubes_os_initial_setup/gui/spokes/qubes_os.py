@@ -486,6 +486,23 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             indent=True,
         )
 
+        if self.qubes_data.disp_preload_available:
+            self.choice_disp_preload = QubesButtonChoice(
+                location=self.mainBox,
+                label=_(
+                    "Preload disposable qubes based on the default DispVM (faster usage)"
+                ),
+                dependencies=[self.choice_system],
+                indent=True,
+            )
+        else:
+            label_prefix = "Preloading disposables not available "
+            label_suffix = "(not enough memory)"
+            self.choice_disp_preload = QubesDisabledButtonChoice(
+                location=self.mainBox, label=_(label_prefix + label_suffix),
+                indent=True,
+            )
+
         self.choice_default = QubesButtonChoice(
             location=self.mainBox,
             label=_(
@@ -603,6 +620,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.choice_system.widget.set_active(True)
 
         self.choice_disp_firewallvm_and_usbvm.widget.set_active(True)
+        self.choice_disp_preload.widget.set_active(self.qubes_data.disp_preload_available)
 
         self.choice_default.widget.set_active(True)
 
@@ -664,6 +682,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             self.qubes_data.disp_firewallvm_and_usbvm
         )
         self.choice_disp_netvm.set_selected(self.qubes_data.disp_netvm)
+        self.choice_disp_preload.set_selected(self.qubes_data.disp_preload_available)
 
         self.choice_default.set_selected(self.qubes_data.default_vms)
 
@@ -728,6 +747,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             self.choice_disp_firewallvm_and_usbvm.get_selected()
         )
         self.qubes_data.disp_netvm = self.choice_disp_netvm.get_selected()
+        self.qubes_data.disp_preload = self.choice_disp_preload.get_selected()
 
         self.qubes_data.default_vms = self.choice_default.get_selected()
 

@@ -140,6 +140,14 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
                 title=_("Make sys-net disposable"), completed=self._disp_netvm
             )
             self._container.add(w, self._set_checkbox, "_disp_netvm")
+            if self.qubes_data.disp_preload_available:
+                title_begin = "Preload disposable qubes based on the default DispVM "
+                title_end = "(faster usage)"
+                w = CheckboxWidget(
+                    title=_(title_begin + title_end),
+                    completed=self._disp_preload,
+                )
+                self._container.add(w, self._set_checkbox, "_disp_preload")
         w = CheckboxWidget(
             title=_(
                 "Create default application qubes " "(personal, work, untrusted, vault)"

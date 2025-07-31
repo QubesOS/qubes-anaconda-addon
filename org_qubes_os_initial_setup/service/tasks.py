@@ -214,6 +214,7 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
         whonix_vms,
         default_vms,
         disp_netvm,
+        disp_preload,
     ):
         super().__init__()
         self.system_vms = system_vms
@@ -226,6 +227,7 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
         self.whonix_vms = whonix_vms
         self.default_vms = default_vms
         self.disp_netvm = disp_netvm
+        self.disp_preload = disp_preload
 
     @property
     def name(self):
@@ -241,6 +243,8 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
             )
         if self.disp_netvm:
             states.append("pillar.qvm.disposable-sys-net")
+        if self.disp_preload:
+            states.append("pillar.qvm.disposable-preload")
         if self.default_vms:
             states.extend(("qvm.personal", "qvm.work", "qvm.untrusted", "qvm.vault"))
         if self.whonix_vms:

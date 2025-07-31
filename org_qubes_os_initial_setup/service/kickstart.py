@@ -37,6 +37,7 @@ class QubesData(AddonData):
         "system_vms",
         "disp_firewallvm_and_usbvm",
         "disp_netvm",
+        "disp_preload",
         "default_vms",
         "whonix_vms",
         "whonix_default",
@@ -55,6 +56,7 @@ class QubesData(AddonData):
 
         self.disp_firewallvm_and_usbvm = True
         self.disp_netvm = False
+        self.disp_preload = None
 
         self.default_vms = True
 
