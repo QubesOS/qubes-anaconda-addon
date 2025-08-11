@@ -189,7 +189,9 @@ def is_disp_preload_available() -> bool:
     except subprocess.CalledProcessError:
         return False
     total_memory_gigabytes = int(total_memory_megabytes / 1000)
-    return bool(total_memory_gigabytes >= 16)
+    # Some systems allocate kernel resources needed for some components such as
+    # integrated graphics, thus deducting from total memory. Be lenient.
+    return bool(total_memory_gigabytes >= 15)
 
 
 def get_default_tpool():
