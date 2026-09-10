@@ -235,6 +235,7 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
 
     def run(self):
         states = []
+        post_disabled_pillars = []
         if self.system_vms:
             states.extend(("qvm.sys-net", "qvm.sys-firewall", "qvm.default-dispvm"))
         if self.disp_firewallvm_and_usbvm:
@@ -245,6 +246,7 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
             states.append("pillar.qvm.disposable-sys-net")
         if self.disp_preload:
             states.append("pillar.qvm.disposable-preload")
+            post_disabled_pillars.append("qvm.disposable-preload")
         if self.default_vms:
             states.extend(("qvm.personal", "qvm.work", "qvm.untrusted", "qvm.vault"))
         if self.whonix_vms:
@@ -287,6 +289,8 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
             for state in states:
                 if not state.startswith("pillar."):
                     self.run_command(["qubesctl", "top.disable", state])
+            for pillar in post_disabled_pillars:
+                self.run_command(["qubesctl", "top.disable", pillar, "pillar=True"])
         except Exception:
             raise Exception(
                 (
