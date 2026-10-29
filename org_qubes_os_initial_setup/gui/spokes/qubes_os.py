@@ -106,6 +106,8 @@ class QubesButtonChoice(QubesChoiceBase):
         )
         self.label = label
         self.selected = None
+        # user choice kept aside while dependencies are not selected
+        self._saved_active = None
 
         for dependency in self.dependencies:
             dependency.connect(self.friend_on_toggled)
@@ -117,6 +119,32 @@ class QubesButtonChoice(QubesChoiceBase):
     def connect(self, *args):
         self.widget.connect("toggled", *args)
         self.widget.connect("notify::sensitive", *args)
+
+    def is_checked(self):
+        return self.widget.get_active()
+
+    def are_dependencies_checked(self):
+        # unlike are_dependencies_selected(), ignore sensitivity, so that
+        # greying out everything (advanced configuration) does not clear choices
+        return all(dependency.is_checked() for dependency in self.dependencies)
+
+    def friend_on_toggled(self, *args):
+        if self.are_dependencies_checked():
+            if self._saved_active is not None:
+                self.widget.set_active(self._saved_active)
+                self._saved_active = None
+        elif self._saved_active is None:
+            # do not show the choice as checked while it cannot apply,
+            # restore it once dependencies are checked again
+            self._saved_active = self.widget.get_active()
+            self.widget.set_active(False)
+        super().friend_on_toggled(*args)
+
+    def set_selected(self, value):
+        if not self.are_dependencies_checked():
+            self._saved_active = value
+            value = False
+        super().set_selected(value)
 
 
 class QubesInstallTemplateChoice(QubesButtonChoice):
@@ -246,6 +274,9 @@ class QubesTemplateChoice(QubesListChoice):
         ]
         # It is 'any' because it's a choice among a list
         return any(dependencies_status)
+
+    def is_checked(self):
+        return any(dependency.is_checked() for dependency in self.dependencies)
 
 
 #
