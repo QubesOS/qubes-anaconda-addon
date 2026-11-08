@@ -22,13 +22,7 @@
 from org_qubes_os_initial_setup.constants import QUBES_INITIAL_SETUP
 from org_qubes_os_initial_setup.service.kickstart import QubesData
 from org_qubes_os_initial_setup.utils import CamelCaseWrap
-
-# import gettext
-# _ = lambda x: gettext.ldgettext("qubes-os-anaconda-plugin", x)
-
-# will never be translated
-_ = lambda x: x
-N_ = lambda x: x
+from org_qubes_os_initial_setup.i18n import _
 
 from pyanaconda.ui.categories.system import SystemCategory
 from pyanaconda.ui.tui.spokes import NormalTUISpoke
@@ -77,8 +71,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
 
         self.initialize_start()
 
-        # title of the spoke
-        self.title = N_("Qubes OS")
+        # title of the spoke, translated here in the addon domain because
+        # the hub translates it in the "anaconda" domain
+        self.title = _("Qubes OS")
 
         self._container = None
 
@@ -141,10 +136,11 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalTUISpoke):
             )
             self._container.add(w, self._set_checkbox, "_disp_netvm")
             if self.qubes_data.disp_preload_available:
-                title_begin = "Preload disposable qubes based on the default DispVM "
-                title_end = "(faster usage)"
                 w = CheckboxWidget(
-                    title=_(title_begin + title_end),
+                    title=_(
+                        "Preload disposable qubes based on the default DispVM "
+                        "(faster usage)"
+                    ),
                     completed=self._disp_preload,
                 )
                 self._container.add(w, self._set_checkbox, "_disp_preload")

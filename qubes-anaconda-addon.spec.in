@@ -7,6 +7,7 @@ License:        GPLv2+
 
 BuildArch:      noarch
 BuildRequires:  python3
+BuildRequires:  gettext
 Requires:       python3
 Requires:       python3-looseversion
 Requires:       qubes-mgmt-salt-dom0-virtual-machines >= 4.1.19
@@ -23,6 +24,12 @@ at first boot time.
 %prep
 %setup -q
 
+%build
+for po in locale/*/LC_MESSAGES/qubes-anaconda-addon.po; do
+    [ -e "$po" ] || continue
+    msgfmt -c -o "${po%%.po}.mo" "$po"
+done
+
 %install
 rm -rf $RPM_BUILD_ROOT
 
@@ -32,8 +39,13 @@ install -m0644 -D dbus/org_qubes_os_initial_setup.service \
     $RPM_BUILD_ROOT/%{_datadir}/anaconda/dbus/services/org_qubes_os_initial_setup.service
 install -d $RPM_BUILD_ROOT/%{_datadir}/anaconda/addons
 cp -a org_qubes_os_initial_setup $RPM_BUILD_ROOT/%{_datadir}/anaconda/addons/
+for mo in locale/*/LC_MESSAGES/qubes-anaconda-addon.mo; do
+    [ -e "$mo" ] || continue
+    install -m0644 -D "$mo" "$RPM_BUILD_ROOT/%{_datadir}/$mo"
+done
+%find_lang qubes-anaconda-addon
 
-%files
+%files -f qubes-anaconda-addon.lang
 %defattr(-,root,root,-)
 %doc LICENSE README
 %{_datadir}/anaconda/dbus/confs/org_qubes_os_initial_setup.conf

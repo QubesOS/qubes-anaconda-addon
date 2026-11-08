@@ -23,10 +23,7 @@
 
 """Module with the QubesOsSpoke class."""
 from org_qubes_os_initial_setup.utils import CamelCaseWrap
-
-# will never be translated
-_ = lambda x: x
-N_ = lambda x: x
+from org_qubes_os_initial_setup.i18n import _, N_, TRANSLATION_DOMAIN
 
 import os
 import subprocess
@@ -58,9 +55,11 @@ class QubesChoiceBase:
         self.dependencies = dependencies or []
 
         if self.indent:
-            self.outer_widget = Gtk.Alignment()
-            self.outer_widget.add(self.widget)
-            self.outer_widget.set_padding(0, 0, 20, 0)
+            # margin-start (not Gtk.Alignment left padding) so the indent
+            # is mirrored in right-to-left locales
+            self.outer_widget = Gtk.Box()
+            self.outer_widget.set_margin_start(20)
+            self.outer_widget.pack_start(self.widget, True, True, 0)
         else:
             self.outer_widget = self.widget
 
@@ -223,7 +222,7 @@ class QubesTemplateChoice(QubesListChoice):
     def __init__(self, location, entries, dependencies=None):
         super().__init__(
             location=location,
-            label="Default:",
+            label=_("Default:"),
             entries=entries,
             dependencies=dependencies,
         )
@@ -392,6 +391,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
     # name of the .glade file in the same directory as this source
     uiFile = "qubes_os.glade"
 
+    # gettext domain used for the strings in the .glade file
+    translationDomain = TRANSLATION_DOMAIN
+
     # category this spoke belongs to
     category = SystemCategory
 
@@ -419,6 +421,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
 
         NormalSpoke.__init__(self, data, storage, payload)
 
+        # the hub translates the title in the "anaconda" domain, which does
+        # not know this string, so translate it here in the addon domain
+        self.title = _(self.title)
+
         self.qubes_data = CamelCaseWrap(QUBES_INITIAL_SETUP.get_proxy())
         self.logger = logging.getLogger("anaconda")
 
@@ -442,14 +448,14 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             default_templates.append(alias)
             self.template_choices[template] = QubesInstallTemplateChoice(
                 location=self.templatesBox,
-                label=_(alias),
+                label=alias,
                 template=template,
             )
 
         if self.qubes_data.whonix_available:
             self.choice_install_whonix = QubesButtonChoice(
                 location=self.templatesBox,
-                label=_(self.qubes_data.templates_aliases["whonix"]),
+                label=self.qubes_data.templates_aliases["whonix"],
             )
         else:
             self.choice_install_whonix = QubesDisabledButtonChoice(
@@ -496,10 +502,9 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 indent=True,
             )
         else:
-            label_prefix = "Preloading disposables not available "
-            label_suffix = "(not enough memory)"
             self.choice_disp_preload = QubesDisabledButtonChoice(
-                location=self.mainBox, label=_(label_prefix + label_suffix),
+                location=self.mainBox,
+                label=_("Preloading disposables not available (not enough memory)"),
                 indent=True,
             )
 
