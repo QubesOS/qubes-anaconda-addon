@@ -27,6 +27,7 @@ from pyanaconda.core.configuration.anaconda import conf
 from pyanaconda.modules.common.task import Task
 
 from org_qubes_os_initial_setup.constants import TEMPLATES_RPM_PATH
+from org_qubes_os_initial_setup.i18n import _
 from org_qubes_os_initial_setup.utils import get_template_name, get_template_rpm
 
 log = logging.getLogger(__name__)
@@ -69,7 +70,7 @@ class BaseQubesTask(Task):
 class DefaultKernelTask(BaseQubesTask):
     @property
     def name(self):
-        return "Setup up default kernel"
+        return _("Setup up default kernel")
 
     def run(self):
         installed_kernels = os.listdir("/var/lib/qubes/vm-kernels")
@@ -88,7 +89,7 @@ class DefaultPoolTask(BaseQubesTask):
 
     @property
     def name(self):
-        return "Setup up default storage pool"
+        return _("Setup up default storage pool")
 
     def run(self):
         # At this stage:
@@ -101,7 +102,7 @@ class DefaultPoolTask(BaseQubesTask):
             # should be pre-filled based on rootfs's volume group
             # see utils.get_default_tpool() called from QubesInitialSetup()
             if self.vg_tpool is None:
-                raise Exception("Cannot find default LVM volume group")
+                raise Exception(_("Cannot find default LVM volume group"))
             self.run_command(
                 [
                     "/usr/sbin/lvcreate",
@@ -148,12 +149,12 @@ class InstallTemplateTask(BaseQubesTask):
 
     @property
     def name(self):
-        return "Install template " + self.template
+        return _("Install template %s") % self.template
 
     def run(self):
         template = self.template
         template_name = get_template_name(template)
-        self.report_progress("Installing TemplateVM %s" % template_name)
+        self.report_progress(_("Installing TemplateVM %s") % template_name)
         rpm = get_template_rpm(template)
         self.run_command(["/usr/bin/qvm-template", "install", "--nogpgcheck", rpm])
 
@@ -161,7 +162,7 @@ class InstallTemplateTask(BaseQubesTask):
 class CleanTemplatePkgsTask(BaseQubesTask):
     @property
     def name(self):
-        return "Setting up default pool"
+        return _("Setting up default pool")
 
     def run(self):
         # Clean RPM after install of selected ones
@@ -172,7 +173,7 @@ class CleanTemplatePkgsTask(BaseQubesTask):
 class ConfigureDom0Task(BaseQubesTask):
     @property
     def name(self):
-        return "Setup up administration VM (dom0)"
+        return _("Setup up administration VM (dom0)")
 
     def run(self):
         for service in ["rdisc", "kdump", "libvirt-guests", "salt-minion"]:
@@ -192,7 +193,7 @@ class SetDefaultTemplateTask(BaseQubesTask):
 
     @property
     def name(self):
-        return "Setup default template"
+        return _("Setup default template")
 
     def run(self):
         if self.default_template:
@@ -231,7 +232,7 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
 
     @property
     def name(self):
-        return "Executing qubes configuration"
+        return _("Executing qubes configuration")
 
     def run(self):
         states = []
@@ -293,12 +294,12 @@ class ConfigureDefaultQubesTask(BaseQubesTask):
                 self.run_command(["qubesctl", "top.disable", pillar, "pillar=True"])
         except Exception:
             raise Exception(
-                (
+                _(
                     "Qubes initial configuration failed. Login to the system and "
-                    + "check /var/log/salt/minion for details. "
-                    + "You can retry configuration by calling "
-                    + "'sudo qubesctl --all state.highstate' in dom0 (you will get "
-                    + "detailed state there)."
+                    "check /var/log/salt/minion for details. "
+                    "You can retry configuration by calling "
+                    "'sudo qubesctl --all state.highstate' in dom0 (you will get "
+                    "detailed state there)."
                 )
             )
 
@@ -310,7 +311,7 @@ class CreateDefaultDVMTask(BaseQubesTask):
 
     @property
     def name(self):
-        return "Create default DisposableVM"
+        return _("Create default DisposableVM")
 
     def run(self):
         if self.default_template:
@@ -328,7 +329,7 @@ class ConfigureNetworkTask(BaseQubesTask):
 
     @property
     def name(self):
-        return "Setup networking"
+        return _("Setup networking")
 
     def run(self):
         default_netvm = "sys-firewall"

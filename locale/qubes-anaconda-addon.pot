@@ -1,0 +1,205 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the qubes-anaconda-addon package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: qubes-anaconda-addon 4.3.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-11-08 02:29+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.glade:10
+msgid "QUBES OS"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.glade:65
+msgid "Templates Configuration"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.glade:85
+msgid "Installation:"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.glade:135
+msgid "Main Configuration"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.glade:193
+msgid "Advanced Configuration"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:225
+msgid "Default:"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:280
+msgid "Create 'vm-pool' LVM thin pool"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:285
+msgid "Use existing LVM thin pool"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:316
+msgid "LVM Volume Group:"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:321
+msgid "LVM Thin Pool:"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:405
+msgid "_QUBES OS"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:462
+msgid "Whonix not available"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:476
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:123
+msgid "Create default system qubes (sys-net, sys-firewall, default DispVM)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:483
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:130
+msgid "Make sys-firewall and sys-usb disposable"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:490
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:135
+msgid "Make sys-net disposable"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:499
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:141
+msgid "Preload disposable qubes based on the default DispVM (faster usage)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:507
+msgid "Preloading disposables not available (not enough memory)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:514
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:149
+msgid "Create default application qubes (personal, work, untrusted, vault)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:523
+msgid ""
+"Use a qube to hold all USB controllers (create a new qube called sys-usb by "
+"default)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:530
+msgid "USB qube configuration disabled - you are using USB disk"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:535
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:180
+msgid "Use sys-net qube for both networking and USB devices"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:541
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:186
+msgid "Automatically accept USB mice (discouraged)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:548
+msgid ""
+"Automatically accept USB keyboard (discouraged if non-USB keyboard is "
+"available)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:563
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:157
+msgid "Create Whonix Gateway and Workstation qubes (sys-whonix, anon-whonix)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:574
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:166
+msgid ""
+"Enable system and template updates over the Tor anonymity network using "
+"Whonix"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:605
+msgid "Do not configure anything (for advanced users)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/gui/spokes/qubes_os.py:704
+msgid ""
+"<b>INFO:</b> the following USB keyboards will be connected to sys-usb:\n"
+"{}\n"
+"<b>If you disable the option above, they will not function in Qubes.</b>"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:73
+msgid "Setup up default kernel"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:92
+msgid "Setup up default storage pool"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:105
+msgid "Cannot find default LVM volume group"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:152
+#, python-format
+msgid "Install template %s"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:157
+#, python-format
+msgid "Installing TemplateVM %s"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:165
+msgid "Setting up default pool"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:176
+msgid "Setup up administration VM (dom0)"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:196
+msgid "Setup default template"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:235
+msgid "Executing qubes configuration"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:298
+msgid ""
+"Qubes initial configuration failed. Login to the system and check /var/log/"
+"salt/minion for details. You can retry configuration by calling 'sudo "
+"qubesctl --all state.highstate' in dom0 (you will get detailed state there)."
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:314
+msgid "Create default DisposableVM"
+msgstr ""
+
+#: org_qubes_os_initial_setup/service/tasks.py:332
+msgid "Setup networking"
+msgstr ""
+
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:76
+msgid "Qubes OS"
+msgstr ""
+
+#: org_qubes_os_initial_setup/tui/spokes/qubes_os.py:174
+msgid "Create USB qube holding all USB controllers (sys-usb)"
+msgstr ""
