@@ -97,7 +97,7 @@ class QubesChoiceBase:
 # Gtk.CheckButton
 #
 class QubesButtonChoice(QubesChoiceBase):
-    def __init__(self, location, label, dependencies=None, indent=False):
+    def __init__(self, location, label, dependencies=None, indent=False, tooltip=None):
         super().__init__(
             widget=Gtk.CheckButton(label=label),
             location=location,
@@ -105,6 +105,8 @@ class QubesButtonChoice(QubesChoiceBase):
             dependencies=dependencies,
         )
         self.label = label
+        if tooltip:
+            self.widget.set_tooltip_text(tooltip)
         self.selected = None
 
         for dependency in self.dependencies:
@@ -160,10 +162,12 @@ class QubesDisabledButtonChoice(QubesButtonChoice):
 # Gtk.CheckButton
 #
 class QubesAdvancedChoice(QubesChoiceBase):
-    def __init__(self, location, label, indent=False):
+    def __init__(self, location, label, indent=False, tooltip=None):
         super().__init__(
             widget=Gtk.CheckButton(label=label), location=location, indent=indent
         )
+        if tooltip:
+            self.widget.set_tooltip_text(tooltip)
         self.widget.connect("toggled", self.disable_configuration)
 
     @staticmethod
@@ -470,6 +474,11 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 "Create default system qubes (sys-net, sys-firewall, default DispVM)"
             ),
             dependencies=[self.choice_default_template],
+            tooltip=_(
+                "sys-net connects to the network, sys-firewall filters the network "
+                "traffic of other qubes, and the default DispVM is the template "
+                "for disposables."
+            ),
         )
 
         self.choice_disp_firewallvm_and_usbvm = QubesButtonChoice(
@@ -477,6 +486,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             label=_("Make sys-firewall and sys-usb disposable"),
             dependencies=[self.choice_system],
             indent=True,
+            tooltip=_(
+                "These qubes start fresh every time. Changes made inside them "
+                "are lost when they shut down."
+            ),
         )
 
         self.choice_disp_netvm = QubesButtonChoice(
@@ -484,6 +497,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             label=_("Make sys-net disposable"),
             dependencies=[self.choice_system],
             indent=True,
+            tooltip=_(
+                "sys-net starts fresh every time. Changes made inside it, such as "
+                "saved Wi-Fi passwords, are lost when it shuts down."
+            ),
         )
 
         if self.qubes_data.disp_preload_available:
@@ -494,6 +511,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 ),
                 dependencies=[self.choice_system],
                 indent=True,
+                tooltip=_(
+                    "Start some disposables in the background, so that opening a "
+                    "disposable is faster. This uses more memory."
+                ),
             )
         else:
             label_prefix = "Preloading disposables not available "
@@ -518,6 +539,12 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                     "Use a qube to hold all USB controllers (create a new qube called sys-usb by default)"
                 ),
                 dependencies=[self.choice_default_template],
+                tooltip=_(
+                    "Keeps USB devices away from dom0, so a malicious USB device "
+                    "cannot attack it directly. If your only keyboard is a USB "
+                    "keyboard, also accept USB keyboards below, or you will not be "
+                    "able to type in dom0."
+                ),
             )
         else:
             self.choice_usb = QubesDisabledButtonChoice(
@@ -530,12 +557,17 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             label=_("Use sys-net qube for both networking and USB devices"),
             dependencies=[self.choice_usb],
             indent=True,
+            tooltip=_(
+                "Uses less memory, but USB devices and the network then share "
+                "one qube."
+            ),
         )
         self.choice_allow_usb_mouse = QubesButtonChoice(
             location=self.mainBox,
             label=_("Automatically accept USB mice (discouraged)"),
             dependencies=[self.choice_usb],
             indent=True,
+            tooltip=_("Without this, you are asked before a USB mouse can be used."),
         )
         self.choice_allow_usb_keyboard = QubesButtonChoice(
             location=self.mainBox,
@@ -544,6 +576,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
             ),
             dependencies=[self.choice_usb],
             indent=True,
+            tooltip=_(
+                "Without this, USB keyboards do not work in dom0. With it, a "
+                "malicious USB device can act as a keyboard and type in dom0."
+            ),
         )
         self.usb_keyboards_list = QubesChoiceMessage(
             location=self.mainBox,
@@ -557,6 +593,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 label=_(
                     "Create Whonix Gateway and Workstation qubes (sys-whonix, anon-whonix)"
                 ),
+                tooltip=_(
+                    "sys-whonix sends the network traffic of qubes connected to it "
+                    "through Tor. anon-whonix is a qube connected to sys-whonix."
+                ),
                 dependencies=[
                     self.choice_install_whonix,
                     self.choice_system,
@@ -568,6 +608,7 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
                 label=_(
                     "Enable system and template updates over the Tor anonymity network using Whonix"
                 ),
+                tooltip=_("Updates for dom0 and templates are downloaded through Tor."),
                 dependencies=[
                     self.choice_install_whonix,
                     self.choice_system,
@@ -598,6 +639,10 @@ class QubesOsSpoke(FirstbootOnlySpokeMixIn, NormalSpoke):
         self.check_advanced = QubesAdvancedChoice(
             location=self.advancedBox,
             label=_("Do not configure anything (for advanced users)"),
+            tooltip=_(
+                "Skip all the options above. You set up templates and qubes "
+                "yourself later."
+            ),
         )
 
         for choice in choices_instances:
